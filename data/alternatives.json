@@ -1,0 +1,92 @@
+[
+  {
+    "category": "Bureautique",
+    "bigTech": "Microsoft Office",
+    "nird": "LibreOffice",
+    "description": "Suite bureautique complète (traitement de texte, tableur, présentation)",
+    "compatibility": "Fichiers .docx, .xlsx, .pptx",
+    "difficulty": "Facile",
+    "icon": "fa-file-word"
+  },
+  {
+    "category": "Système d'exploitation",
+    "bigTech": "Windows",
+    "nird": "Linux Ubuntu / Mint",
+    "description": "Système d'exploitation complet, léger et personnalisable",
+    "compatibility": "Compatible avec la plupart des logiciels éducatifs",
+    "difficulty": "Moyen",
+    "icon": "fa-desktop"
+  },
+  {
+    "category": "Navigateur",
+    "bigTech": "Google Chrome",
+    "nird": "Firefox / Chromium",
+    "description": "Navigation web rapide et respectueuse de la vie privée",
+    "compatibility": "Tous les sites web",
+    "difficulty": "Facile",
+    "icon": "fa-globe"
+  },
+  {
+    "category": "Messagerie",
+    "bigTech": "Gmail / Outlook",
+    "nird": "Thunderbird",
+    "description": "Client email complet avec calendrier intégré",
+    "compatibility": "Tous protocoles (IMAP, POP3)",
+    "difficulty": "Facile",
+    "icon": "fa-envelope"
+  },
+  {
+    "category": "Visioconférence",
+    "bigTech": "Microsoft Teams / Zoom",
+    "nird": "Jitsi Meet / BigBlueButton",
+    "description": "Visioconférence sécurisée sans installation",
+    "compatibility": "Navigateur web uniquement",
+    "difficulty": "Facile",
+    "icon": "fa-video"
+  },
+  {
+    "category": "Édition image",
+    "bigTech": "Adobe Photoshop",
+    "nird": "GIMP",
+    "description": "Retouche photo et création graphique professionnelle",
+    "compatibility": "Formats standards (PNG, JPG, SVG)",
+    "difficulty": "Moyen",
+    "icon": "fa-image"
+  },
+  {
+    "category": "Montage vidéo",
+    "bigTech": "Adobe Premiere",
+    "nird": "Kdenlive / Shotcut",
+    "description": "Montage vidéo avec effets et transitions",
+    "compatibility": "Formats vidéo standards",
+    "difficulty": "Moyen",
+    "icon": "fa-film"
+  },
+  {
+    "category": "Stockage cloud",
+    "bigTech": "Google Drive / OneDrive",
+    "nird": "Nextcloud (auto-hébergé)",
+    "description": "Stockage et partage de fichiers en local",
+    "compatibility": "Accès web et applications mobiles",
+    "difficulty": "Avancé",
+    "icon": "fa-cloud"
+  },
+  {
+    "category": "Développement",
+    "bigTech": "Visual Studio",
+    "nird": "VS Code / Geany",
+    "description": "Éditeur de code multi-langages",
+    "compatibility": "Tous langages de programmation",
+    "difficulty": "Moyen",
+    "icon": "fa-code"
+  },
+  {
+    "category": "PDF",
+    "bigTech": "Adobe Acrobat",
+    "nird": "PDF Arranger / Okular",
+    "description": "Lecture et édition de documents PDF",
+    "compatibility": "Format PDF standard",
+    "difficulty": "Facile",
+    "icon": "fa-file-pdf"
+  }
+]

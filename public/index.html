@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIRD Navigator Academy - Village Numérique Résistant</title>
+    <meta
+      name="description"
+      content="Accompagnez votre établissement vers l'autonomie numérique avec NIRD"
+    />
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="font-body bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-shield-alt text-primary text-2xl"></i>
+            <span class="font-heading font-bold text-xl text-gray-800"
+              >NIRD Academy</span
+            >
+          </div>
+          <div class="hidden md:flex space-x-6">
+            <a href="/" class="nav-link">Accueil</a>
+            <a href="/navigator.html" class="nav-link">Navigator</a>
+            <a href="/academy.html" class="nav-link">Académie</a>
+            <a href="/resources.html" class="nav-link">Ressources</a>
+          </div>
+          <button class="md:hidden" id="mobile-menu-btn">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      class="hero-section bg-gradient-to-br from-blue-600 to-blue-800 text-white py-20"
+    >
+      <div class="container mx-auto px-4 text-center">
+        <h1
+          class="font-heading text-5xl md:text-6xl font-bold mb-6 animate-fade-in"
+        >
+          🛡️ Le Village Numérique Résistant
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+          De l'Empire Big Tech au Village Autonome
+        </p>
+        <p class="text-lg mb-12 max-w-2xl mx-auto opacity-90">
+          Découvrez comment votre établissement peut gagner en autonomie
+          numérique, économiser des milliers d'euros et réduire son impact
+          carbone.
+        </p>
+
+        <!-- Stats -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12"
+        >
+          <div
+            class="stat-card bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
+          >
+            <div class="text-4xl font-bold text-accent">50+</div>
+            <div class="text-sm mt-2">Établissements NIRD</div>
+          </div>
+          <div
+            class="stat-card bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
+          >
+            <div class="text-4xl font-bold text-accent">30%</div>
+            <div class="text-sm mt-2">Économies moyennes</div>
+          </div>
+          <div
+            class="stat-card bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
+          >
+            <div class="text-4xl font-bold text-accent">200kg</div>
+            <div class="text-sm mt-2">CO₂ évité par PC</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Portails d'entrée -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <h2 class="font-heading text-4xl font-bold text-center mb-4">
+          Choisissez votre parcours
+        </h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          Selon votre profil, découvrez comment NIRD peut vous aider
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Portail Élève -->
+          <div
+            class="portal-card group hover:shadow-2xl transition-all duration-300 bg-blue-50 rounded-xl p-8 cursor-pointer border-2 border-transparent hover:border-blue-500"
+          >
+            <div class="text-5xl mb-4">🎓</div>
+            <h3 class="font-heading text-2xl font-bold mb-3 text-gray-800">
+              Élève / Éco-délégué
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Comprendre l'impact du numérique et agir pour un lycée plus
+              responsable
+            </p>
+            <a href="/academy.html" class="btn-primary inline-block">
+              Découvrir l'Académie <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+
+          <!-- Portail Enseignant -->
+          <div
+            class="portal-card group hover:shadow-2xl transition-all duration-300 bg-green-50 rounded-xl p-8 cursor-pointer border-2 border-transparent hover:border-green-500"
+          >
+            <div class="text-5xl mb-4">👨‍🏫</div>
+            <h3 class="font-heading text-2xl font-bold mb-3 text-gray-800">
+              Enseignant / Direction
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Diagnostiquer votre dépendance et planifier votre transition NIRD
+            </p>
+            <a href="/navigator.html" class="btn-primary inline-block">
+              Lancer le diagnostic <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+
+          <!-- Portail Collectivité -->
+          <div
+            class="portal-card group hover:shadow-2xl transition-all duration-300 bg-yellow-50 rounded-xl p-8 cursor-pointer border-2 border-transparent hover:border-yellow-500"
+          >
+            <div class="text-5xl mb-4">🏛️</div>
+            <h3 class="font-heading text-2xl font-bold mb-3 text-gray-800">
+              Collectivité
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Investir intelligemment dans un numérique durable et économique
+            </p>
+            <a
+              href="/navigator.html?profile=collectivity"
+              class="btn-primary inline-block"
+            >
+              Calculer les économies <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pourquoi NIRD -->
+    <section class="py-16 bg-gray-100">
+      <div class="container mx-auto px-4">
+        <h2 class="font-heading text-4xl font-bold text-center mb-12">
+          Pourquoi rejoindre le Village NIRD ?
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="feature-card bg-white rounded-lg p-6 text-center">
+            <i class="fas fa-coins text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="font-heading text-xl font-bold mb-2">Économies</h3>
+            <p class="text-gray-600 text-sm">
+              Jusqu'à 30% d'économies sur 5 ans
+            </p>
+          </div>
+
+          <div class="feature-card bg-white rounded-lg p-6 text-center">
+            <i class="fas fa-leaf text-4xl text-green-500 mb-4"></i>
+            <h3 class="font-heading text-xl font-bold mb-2">Écologie</h3>
+            <p class="text-gray-600 text-sm">
+              Prolongez la vie de vos équipements
+            </p>
+          </div>
+
+          <div class="feature-card bg-white rounded-lg p-6 text-center">
+            <i class="fas fa-unlock text-4xl text-blue-500 mb-4"></i>
+            <h3 class="font-heading text-xl font-bold mb-2">Autonomie</h3>
+            <p class="text-gray-600 text-sm">Maîtrisez vos outils numériques</p>
+          </div>
+
+          <div class="feature-card bg-white rounded-lg p-6 text-center">
+            <i class="fas fa-users text-4xl text-red-500 mb-4"></i>
+            <h3 class="font-heading text-xl font-bold mb-2">Communauté</h3>
+            <p class="text-gray-600 text-sm">Rejoignez 50+ établissements</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-red-600 to-red-700 text-white">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="font-heading text-4xl font-bold mb-6">
+          Prêt à rejoindre la résistance numérique ?
+        </h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+          Commencez votre parcours vers l'autonomie dès maintenant
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/navigator.html" class="btn-secondary">
+            <i class="fas fa-calculator mr-2"></i> Faire le diagnostic
+          </a>
+          <a href="/academy.html" class="btn-outline">
+            <i class="fas fa-graduation-cap mr-2"></i> Découvrir l'Académie
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="font-heading text-xl font-bold mb-4 text-white">
+              NIRD Academy
+            </h3>
+            <p class="text-sm">
+              Plateforme d'accompagnement vers l'autonomie numérique pour les
+              établissements scolaires
+            </p>
+          </div>
+
+          <div>
+            <h3 class="font-heading text-xl font-bold mb-4 text-white">
+              Liens utiles
+            </h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="https://nird.forge.apps.education.fr/"
+                  target="_blank"
+                  class="hover:text-white"
+                  >Site NIRD Officiel</a
+                >
+              </li>
+              <li>
+                <a href="/resources.html" class="hover:text-white"
+                  >Ressources</a
+                >
+              </li>
+              <li><a href="#" class="hover:text-white">Documentation</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-heading text-xl font-bold mb-4 text-white">
+              Nuit de l'Info 2025
+            </h3>
+            <p class="text-sm mb-2">Projet porté par l'équipe UPSEJ</p>
+            <p class="text-xs">
+              <i class="fas fa-code"></i> Code sous licence MIT<br />
+              <i class="fas fa-creative-commons"></i> Contenu sous CC BY-SA 4.0
+            </p>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
+          <p>&copy; 2025 NIRD Navigator Academy - Nuit de l'Info</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,155 @@
+{
+  "level1": {
+    "title": "Ouvrir les yeux",
+    "description": "Comprendre la dépendance numérique",
+    "questions": [
+      {
+        "id": "q1_1",
+        "question": "Windows 10 ne sera plus supporté par Microsoft en 2025, rendant obsolètes des millions d'ordinateurs fonctionnels.",
+        "type": "true-false",
+        "correct": true,
+        "explanation": "Le support de Windows 10 prend fin en octobre 2025. Les machines qui ne peuvent pas passer à Windows 11 deviennent vulnérables aux failles de sécurité."
+      },
+      {
+        "id": "q1_2",
+        "question": "Un ordinateur sous Linux peut fonctionner aussi bien qu'un ordinateur récent sous Windows.",
+        "type": "true-false",
+        "correct": true,
+        "explanation": "Linux est beaucoup plus léger que Windows. Un vieux PC sous Linux peut être plus rapide qu'un PC récent sous Windows."
+      },
+      {
+        "id": "q1_3",
+        "question": "La fabrication d'un ordinateur émet environ combien de kg de CO2 ?",
+        "type": "multiple-choice",
+        "options": ["20 kg", "50 kg", "200 kg", "500 kg"],
+        "correct": 2,
+        "explanation": "La fabrication d'un ordinateur émet environ 200 kg de CO2, soit l'équivalent de 1 000 km en voiture. Le garder le plus longtemps possible est donc essentiel."
+      },
+      {
+        "id": "q1_4",
+        "question": "Combien coûte une licence Windows 10 Pro Éducation par an ?",
+        "type": "multiple-choice",
+        "options": ["Gratuit", "50€", "150€", "300€"],
+        "correct": 2,
+        "explanation": "Une licence Windows coûte environ 150€ par machine et par an. Pour 100 machines, cela représente 15 000€ annuels."
+      },
+      {
+        "id": "q1_5",
+        "question": "Les logiciels libres sont de moins bonne qualité que les logiciels propriétaires.",
+        "type": "true-false",
+        "correct": false,
+        "explanation": "Faux ! Des logiciels comme Firefox, VLC, LibreOffice sont utilisés par des millions de personnes et sont aussi performants que leurs équivalents propriétaires."
+      }
+    ]
+  },
+  "level2": {
+    "title": "Découvrir les alternatives",
+    "description": "Connaître les solutions libres",
+    "questions": [
+      {
+        "id": "q2_1",
+        "question": "Quel est l'équivalent libre de Microsoft Word ?",
+        "type": "multiple-choice",
+        "options": ["LibreOffice Writer", "Google Docs", "Notepad++", "Vim"],
+        "correct": 0,
+        "explanation": "LibreOffice Writer est l'alternative libre complète à Microsoft Word, compatible avec les fichiers .docx"
+      },
+      {
+        "id": "q2_2",
+        "question": "Quel système d'exploitation libre est le plus adapté pour remplacer Windows dans un établissement scolaire ?",
+        "type": "multiple-choice",
+        "options": ["Android", "Linux Ubuntu", "macOS", "Chrome OS"],
+        "correct": 1,
+        "explanation": "Linux Ubuntu (ou sa variante éducative) est conçu pour être facile d'utilisation et dispose de toutes les applications nécessaires à l'enseignement."
+      },
+      {
+        "id": "q2_3",
+        "question": "GIMP est l'alternative libre de quel logiciel ?",
+        "type": "multiple-choice",
+        "options": [
+          "Microsoft Excel",
+          "Adobe Photoshop",
+          "AutoCAD",
+          "Final Cut Pro"
+        ],
+        "correct": 1,
+        "explanation": "GIMP (GNU Image Manipulation Program) est l'équivalent libre et gratuit de Photoshop pour la retouche photo."
+      },
+      {
+        "id": "q2_4",
+        "question": "Nextcloud permet de remplacer Google Drive en auto-hébergeant ses données.",
+        "type": "true-false",
+        "correct": true,
+        "explanation": "Nextcloud est une solution d'hébergement de fichiers en local, offrant les mêmes fonctionnalités que Google Drive mais en gardant le contrôle de ses données."
+      },
+      {
+        "id": "q2_5",
+        "question": "Combien coûte l'installation de Linux sur un ordinateur ?",
+        "type": "multiple-choice",
+        "options": ["0€ (gratuit)", "50€", "150€", "500€"],
+        "correct": 0,
+        "explanation": "Linux est totalement gratuit ! Seul le temps d'installation compte. Avec de la formation, les enseignants et techniciens peuvent le faire eux-mêmes."
+      }
+    ]
+  },
+  "level3": {
+    "title": "Passer à l'action",
+    "description": "Identifier les étapes de transition",
+    "questions": [
+      {
+        "id": "q3_1",
+        "question": "Par où commencer une transition vers NIRD dans un établissement ?",
+        "type": "multiple-choice",
+        "options": [
+          "Remplacer tous les PC en une fois",
+          "Tester sur quelques machines pilotes",
+          "Former uniquement les élèves",
+          "Acheter de nouveaux serveurs"
+        ],
+        "correct": 1,
+        "explanation": "Il faut toujours commencer par une phase pilote sur quelques machines pour tester, former les utilisateurs et identifier les problèmes."
+      },
+      {
+        "id": "q3_2",
+        "question": "Quel est le principal frein à la transition vers le libre dans les établissements ?",
+        "type": "multiple-choice",
+        "options": [
+          "Le coût",
+          "La performance",
+          "La méconnaissance et la résistance au changement",
+          "L'incompatibilité des logiciels"
+        ],
+        "correct": 2,
+        "explanation": "Le principal frein est humain : peur du changement et méconnaissance des alternatives. La formation et la sensibilisation sont clés."
+      },
+      {
+        "id": "q3_3",
+        "question": "Combien de temps faut-il pour migrer un établissement de 200 machines ?",
+        "type": "multiple-choice",
+        "options": ["1 mois", "6 mois", "1 à 2 ans", "5 ans"],
+        "correct": 2,
+        "explanation": "Une migration complète prend 1 à 2 ans : sensibilisation, test pilote, formation, déploiement progressif. Il ne faut pas précipiter."
+      },
+      {
+        "id": "q3_4",
+        "question": "Faut-il obligatoirement des compétences techniques pointues pour installer Linux ?",
+        "type": "true-false",
+        "correct": false,
+        "explanation": "Faux ! Les distributions modernes comme Ubuntu sont très simples à installer. Avec une formation de quelques heures, n'importe qui peut le faire."
+      },
+      {
+        "id": "q3_5",
+        "question": "Quelle ressource est essentielle pour réussir une transition NIRD ?",
+        "type": "multiple-choice",
+        "options": [
+          "Un budget important",
+          "Du matériel neuf",
+          "Une communauté de soutien",
+          "Des développeurs informatiques"
+        ],
+        "correct": 2,
+        "explanation": "La communauté NIRD (enseignants, techniciens, associations) est la ressource la plus précieuse pour partager expériences et solutions."
+      }
+    ]
+  }
+}
