@@ -28,6 +28,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Route Candy Map
+app.get('/map', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'map.html'));
+});
 app.get('/hub.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'hub.html'));
 });

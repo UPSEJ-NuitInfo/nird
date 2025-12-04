@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIRD Academy - Candy Map</title>
+    <link rel="stylesheet" href="css/map.css">
+</head>
+<body>
+    <div class="map-wrapper">
+        <div class="map-header">
+            <div class="map-header-left">
+                <h1>🍬 NIRD Academy Map</h1>
+                <p>Progressez de niveau en niveau dans votre aventure NIRD</p>
+            </div>
+            <div class="profile-area" id="profileArea">
+                <!-- Rempli par JS -->
+            </div>
+            <div class="user-panel" id="userPanel">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+
+        <div class="map-stats">
+            <div class="stat-card">
+                <div class="stat-label">Niveau</div>
+                <div class="stat-value" id="currentLevel">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Complétés</div>
+                <div class="stat-value" id="completedCount">0/6</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">XP</div>
+                <div class="stat-value" id="xpCount">0</div>
+            </div>
+        </div>
+
+        <div class="map-canvas" id="mapContainer"></div>
+
+        <div class="map-footer">
+            <div class="level-card" id="levelInfo">
+                <h3>Niveau 1: Dino Google</h3>
+                <p>Esquivez les obstacles et progressez dans le jeu du dinosaure. Cliquez sur le niveau pour commencer!</p>
+            </div>
+            <div class="map-controls">
+                <button class="btn btn-primary" onclick="playLevel()">▶ Jouer le niveau</button>
+                <button class="btn btn-secondary" onclick="showLeaderboard(gameState.currentLevel)">🏆 Voir leaderboard</button>
+                <button class="btn btn-secondary" onclick="resetProgress()">↻ Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de connexion -->
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎮 Enregistrer votre score</h2>
+                <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="authForm" onsubmit="submitAuth(event)">
+                    <div class="form-group">
+                        <label for="username">Pseudo</label>
+                        <input type="text" id="username" name="username" required placeholder="Votre pseudo">
+                    </div>
+                    <div class="form-group">
+                        <label>Score du niveau</label>
+                        <div id="levelScoreDisplay" style="font-weight:900;font-size:1.2em;color:var(--primary);">0</div>
+                        <input type="hidden" id="levelScore" name="levelScore">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="school">École</label>
+                        <input type="text" id="school" name="school" placeholder="Votre établissement (optionnel)">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">✓ Enregistrer mon score</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAuthModal()">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal du leaderboard -->
+    <div id="leaderboardModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>🏆 Leaderboard</h2>
+                <button class="modal-close" onclick="closeLeaderboardModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="leaderboardContent" class="leaderboard-table"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="closeLeaderboardModal()">Continuer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal profil simple -->
+    <div id="profileModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Mon profil</h2>
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="profileContent">
+                    <!-- Rempli par JS -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeProfileModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/map.js"></script>
+</body>
+</html>
