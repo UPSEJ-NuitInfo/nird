@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIRD Academy - Connexion</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/duolingo.css" />
+    <style>
+      .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #58cc02 0%, #1cb0f6 100%);
+        padding: var(--spacing-lg);
+      }
+
+      .auth-card {
+        background: var(--bg-main);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-2xl);
+        width: 100%;
+        max-width: 450px;
+        box-shadow: var(--shadow-xl);
+      }
+
+      .auth-logo {
+        text-align: center;
+        margin-bottom: var(--spacing-2xl);
+      }
+
+      .auth-logo h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .auth-logo p {
+        color: var(--text-secondary);
+        font-size: 1rem;
+      }
+
+      .auth-tabs {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-2xl);
+        border-bottom: 2px solid var(--border);
+      }
+
+      .auth-tab {
+        flex: 1;
+        padding: var(--spacing-md);
+        background: none;
+        border: none;
+        font-family: var(--font-main);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: var(--transition);
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+      }
+
+      .auth-tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+      }
+
+      .auth-form {
+        display: none;
+      }
+
+      .auth-form.active {
+        display: block;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        margin: var(--spacing-lg) 0;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .anonymous-link {
+        display: block;
+        text-align: center;
+        color: var(--text-secondary);
+        margin-top: var(--spacing-lg);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .anonymous-link:hover {
+        color: var(--primary);
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: var(--spacing-md);
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: var(--spacing-sm);
+      }
+
+      .form-group {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <!-- Logo -->
+        <div class="auth-logo">
+          <h1>🎯 NIRD Academy</h1>
+          <p>Apprends le numérique libre en t'amusant !</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchTab('login')">
+            <i class="fas fa-sign-in-alt"></i> Connexion
+          </button>
+          <button class="auth-tab" onclick="switchTab('register')">
+            <i class="fas fa-user-plus"></i> Inscription
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <form
+          id="loginForm"
+          class="auth-form active"
+          onsubmit="handleLogin(event)"
+        >
+          <div class="form-group">
+            <label class="form-label" for="login-username">
+              <i class="fas fa-user"></i> Nom d'utilisateur
+            </label>
+            <input
+              type="text"
+              id="login-username"
+              class="form-input"
+              placeholder="Ton pseudo"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">
+              <i class="fas fa-lock"></i> Mot de passe
+            </label>
+            <input
+              type="password"
+              id="login-password"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              onclick="togglePassword('login-password')"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full">
+            <i class="fas fa-sign-in-alt"></i> Se connecter
+          </button>
+
+          <div class="divider">ou</div>
+
+          <button
+            type="button"
+            class="btn btn-outline w-full"
+            onclick="continueAnonymous()"
+          >
+            <i class="fas fa-user-secret"></i> Continuer sans compte
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form
+          id="registerForm"
+          class="auth-form"
+          onsubmit="handleRegister(event)"
+        >
+          <div class="form-group">
+            <label class="form-label" for="register-username">
+              <i class="fas fa-user"></i> Nom d'utilisateur
+            </label>
+            <input
+              type="text"
+              id="register-username"
+              class="form-input"
+              placeholder="Choisis un pseudo unique"
+              pattern="[a-zA-Z0-9_]{3,50}"
+              title="3-50 caractères alphanumériques"
+              required
+            />
+            <small style="color: var(--text-secondary)"
+              >3-50 caractères (lettres, chiffres, _)</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="register-email">
+              <i class="fas fa-envelope"></i> Email (optionnel)
+            </label>
+            <input
+              type="email"
+              id="register-email"
+              class="form-input"
+              placeholder="ton@email.fr"
+            />
+            <small style="color: var(--text-secondary)"
+              >Pour récupérer ton compte si besoin</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="register-password">
+              <i class="fas fa-lock"></i> Mot de passe
+            </label>
+            <input
+              type="password"
+              id="register-password"
+              class="form-input"
+              placeholder="••••••••"
+              minlength="6"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              onclick="togglePassword('register-password')"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+            <small style="color: var(--text-secondary)"
+              >Minimum 6 caractères</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="register-password-confirm">
+              <i class="fas fa-lock"></i> Confirmer mot de passe
+            </label>
+            <input
+              type="password"
+              id="register-password-confirm"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              onclick="togglePassword('register-password-confirm')"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full">
+            <i class="fas fa-rocket"></i> Créer mon compte
+          </button>
+
+          <div class="divider">ou</div>
+
+          <button
+            type="button"
+            class="btn btn-outline w-full"
+            onclick="continueAnonymous()"
+          >
+            <i class="fas fa-user-secret"></i> Essayer sans compte
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+      // Switch between tabs
+      function switchTab(tab) {
+        document
+          .querySelectorAll('.auth-tab')
+          .forEach((t) => t.classList.remove('active'));
+        document
+          .querySelectorAll('.auth-form')
+          .forEach((f) => f.classList.remove('active'));
+
+        event.target.closest('.auth-tab').classList.add('active');
+        document.getElementById(tab + 'Form').classList.add('active');
+      }
+
+      // Toggle password visibility
+      function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = event.target.closest('button').querySelector('i');
+
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+
+      // Show toast notification
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+        <i class="fas fa-${
+          type === 'success' ? 'check-circle' : 'exclamation-circle'
+        }"></i>
+        <span>${message}</span>
+      `;
+
+        document.getElementById('toastContainer').appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // Handle login
+      async function handleLogin(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Erreur de connexion');
+          }
+
+          // Save token
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          showToast('Connexion réussie ! 🎉', 'success');
+
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1000);
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      }
+
+      // Handle register
+      async function handleRegister(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('register-username').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const passwordConfirm = document.getElementById(
+          'register-password-confirm',
+        ).value;
+
+        if (password !== passwordConfirm) {
+          showToast('Les mots de passe ne correspondent pas', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username,
+              email: email || null,
+              password,
+              displayName: username,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Erreur lors de l'inscription");
+          }
+
+          // Save token
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          showToast('Compte créé avec succès ! 🚀', 'success');
+
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1000);
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      }
+
+      // Continue anonymous
+      async function continueAnonymous() {
+        try {
+          const response = await fetch('/api/auth/anonymous', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Erreur');
+          }
+
+          // Save token
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          showToast("C'est parti ! 🎮", 'success');
+
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1000);
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      }
+
+      // Check if already logged in
+      if (localStorage.getItem('token')) {
+        window.location.href = '/app';
+      }
+    </script>
+  </body>
+</html>

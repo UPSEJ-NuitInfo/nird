@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leçon - NIRD Academy</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/duolingo.css" />
+    <link rel="stylesheet" href="/css/lesson.css" />
+  </head>
+  <body>
+    <!-- Progress Header -->
+    <div class="lesson-header-bar">
+      <button class="close-btn" onclick="exitLesson()">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="progress-wrapper">
+        <div class="progress-container">
+          <div class="progress-bar" id="lessonProgress" style="width: 0%"></div>
+        </div>
+        <span class="progress-text" id="progressText">0/0</span>
+      </div>
+
+      <div class="xp-counter">
+        <i class="fas fa-star"></i>
+        <span id="sessionXP">0</span> XP
+      </div>
+    </div>
+
+    <!-- Exercise Container -->
+    <div class="exercise-container" id="exerciseContainer">
+      <!-- Will be populated by JS -->
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="feedback-modal hidden" id="feedbackModal">
+      <div class="feedback-content">
+        <div class="feedback-icon" id="feedbackIcon"></div>
+        <h2 class="feedback-title" id="feedbackTitle"></h2>
+        <p class="feedback-message" id="feedbackMessage"></p>
+        <div class="feedback-xp" id="feedbackXP"></div>
+        <button class="btn btn-primary" onclick="nextExercise()">
+          Continuer <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div class="modal-overlay hidden" id="completionModal">
+      <div class="modal">
+        <div class="completion-content">
+          <div class="completion-icon">🎉</div>
+          <h2>Leçon terminée !</h2>
+          <div class="completion-stats">
+            <div class="stat-item">
+              <div class="stat-value" id="finalScore">0%</div>
+              <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="finalXP">0</div>
+              <div class="stat-label">XP gagnés</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="finalStars">⭐⭐⭐</div>
+              <div class="stat-label">Étoiles</div>
+            </div>
+          </div>
+          <div class="completion-actions">
+            <button class="btn btn-outline" onclick="exitLesson()">
+              Retour à l'accueil
+            </button>
+            <button class="btn btn-primary" onclick="retryLesson()">
+              <i class="fas fa-redo"></i> Recommencer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/lesson.js"></script>
+  </body>
+</html>

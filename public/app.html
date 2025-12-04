@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIRD Academy - Apprendre</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/duolingo.css" />
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <nav class="nav">
+          <a href="/app" class="logo">
+            <span>🎯</span>
+            <span>NIRD Academy</span>
+          </a>
+
+          <ul class="nav-menu">
+            <li><a href="/app" class="nav-link active">Apprendre</a></li>
+            <li><a href="/leaderboard.html" class="nav-link">Classement</a></li>
+            <li><a href="/profile.html" class="nav-link">Profil</a></li>
+          </ul>
+
+          <div class="user-info">
+            <div class="xp-badge">
+              <i class="fas fa-star"></i>
+              <span id="userXP">0</span> XP
+            </div>
+            <div class="streak-badge" id="streakBadge" style="display: none">
+              <i class="fas fa-fire"></i>
+              <span id="userStreak">0</span>
+            </div>
+            <img
+              src="/images/avatars/default.png"
+              alt="Avatar"
+              class="user-avatar"
+              id="userAvatar"
+              onclick="toggleUserMenu()"
+            />
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <div class="container">
+        <!-- Learning Path -->
+        <div class="learning-path" id="learningPath">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </main>
+
+    <!-- User Menu Dropdown -->
+    <div class="user-menu hidden" id="userMenu">
+      <div class="user-menu-header">
+        <img src="/images/avatars/default.png" alt="Avatar" id="menuAvatar" />
+        <div>
+          <div class="user-menu-name" id="menuUsername">Utilisateur</div>
+          <div class="user-menu-xp" id="menuXP">0 XP</div>
+        </div>
+      </div>
+      <div class="user-menu-divider"></div>
+      <a href="/profile.html" class="user-menu-item">
+        <i class="fas fa-user"></i> Mon profil
+      </a>
+      <a href="/settings.html" class="user-menu-item">
+        <i class="fas fa-cog"></i> Paramètres
+      </a>
+      <div class="user-menu-divider"></div>
+      <button class="user-menu-item" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loader"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
