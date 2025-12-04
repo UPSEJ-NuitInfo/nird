@@ -57,7 +57,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     localStorage.setItem('user', JSON.stringify(data.user));
 
     // Redirect to hub
-    window.location.href = '/hub.html';
+    window.location.href = '/map.html';
   } catch (error) {
     errorDiv.textContent = error.message;
     submitBtn.disabled = false;
@@ -110,7 +110,7 @@ document
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Redirect to hub
-      window.location.href = '/hub.html';
+      window.location.href = '/map.html';
     } catch (error) {
       errorDiv.textContent = error.message;
       submitBtn.disabled = false;
@@ -120,5 +120,5 @@ document
 
 // Check if already logged in
 if (localStorage.getItem('token')) {
-  window.location.href = '/hub.html';
+  window.location.href = '/map.html';
 }

@@ -32,9 +32,6 @@ app.get('/', (req, res) => {
 app.get('/map', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'map.html'));
 });
-app.get('/hub.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'hub.html'));
-});
 
 // Health check
 app.get('/health', (req, res) => {
