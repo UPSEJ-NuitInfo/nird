@@ -1,4 +1,4 @@
-const { User, Game, HighScore } = require('./models');
+const { User, Game, Highscore } = require('./models');
 const bcrypt = require('bcrypt');
 
 async function seed() {
@@ -39,7 +39,7 @@ async function seed() {
     // ============================================
     console.log('Création scores de démo...');
 
-    await HighScore.bulkCreate([
+    await Highscore.bulkCreate([
       { id_user: demoUser.id, id_game: 1, score: 850 },
       { id_user: demoUser.id, id_game: 2, score: 1200 },
       { id_user: demoUser.id, id_game: 3, score: 3400 },

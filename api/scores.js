@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { HighScore, Game, User } = require('../database/models');
+const { Highscore, Game, User } = require('../database/models');
 const { authenticateToken } = require('./auth_new');
 
 // ============================================
@@ -16,7 +16,7 @@ router.get('/:id/scores', async (req, res) => {
       return res.status(404).json({ error: 'Utilisateur non trouvé' });
     }
 
-    const scores = await HighScore.findAll({
+    const scores = await Highscore.findAll({
       where: { id_user: userId },
       include: [
         {
@@ -52,7 +52,7 @@ router.get('/:id/scores', async (req, res) => {
 // ============================================
 router.get('/me/scores', authenticateToken, async (req, res) => {
   try {
-    const scores = await HighScore.findAll({
+    const scores = await Highscore.findAll({
       where: { id_user: req.user.id },
       include: [
         {

@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// API Routes - Système simplifié (Users, Games, HighScore)
+// API Routes - Système simplifié (Users, Games, Highscore)
 const { router: authRouter } = require('./api/auth_new');
 const gamesRouter = require('./api/games');
 const scoresRouter = require('./api/scores');

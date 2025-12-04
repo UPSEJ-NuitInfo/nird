@@ -103,10 +103,10 @@ const Game = sequelize.define(
 );
 
 // ============================================
-// MODÈLE HighScore
+// MODÈLE Highscore
 // ============================================
-const HighScore = sequelize.define(
-  'HighScore',
+const Highscore = sequelize.define(
+  'Highscore',
   {
     id_user: {
       type: DataTypes.INTEGER,
@@ -226,12 +226,12 @@ const HighScore = sequelize.define(
 // ============================================
 
 User.belongsToMany(Game, {
-  through: HighScore,
+  through: Highscore,
   foreignKey: 'id_user',
   as: 'user',
 });
 Game.belongsToMany(User, {
-  through: HighScore,
+  through: Highscore,
   foreignKey: 'id_game',
   as: 'game',
 });
@@ -243,7 +243,7 @@ module.exports = {
   sequelize,
   User,
   Game,
-  HighScore,
+  Highscore,
   // Achievement,
   // UserAchievement,
 };

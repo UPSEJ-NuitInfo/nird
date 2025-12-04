@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Game, HighScore, User } = require('../database/models');
+const { Game, Highscore, User } = require('../database/models');
 const { authenticateToken } = require('./auth_new');
 
 // ============================================
@@ -56,7 +56,7 @@ router.post('/:id/score', authenticateToken, async (req, res) => {
     }
 
     // Récupérer le highscore actuel
-    const [highScore, created] = await HighScore.findOrCreate({
+    const [highScore, created] = await Highscore.findOrCreate({
       where: {
         id_user: req.user.id,
         id_game: gameId,
@@ -67,16 +67,16 @@ router.post('/:id/score', authenticateToken, async (req, res) => {
     });
 
     // Mettre à jour si meilleur score
-    let isNewHighScore = false;
+    let isNewHighscore = false;
     if (!created && score > highScore.score) {
       await highScore.update({ score });
-      isNewHighScore = true;
+      isNewHighscore = true;
     }
 
     res.json({
-      message: isNewHighScore ? 'Nouveau record !' : 'Score enregistré',
+      message: isNewHighscore ? 'Nouveau record !' : 'Score enregistré',
       highScore: Math.max(highScore.score, score),
-      isNewHighScore: isNewHighScore || created,
+      isNewHighscore: isNewHighscore || created,
     });
   } catch (error) {
     console.error('Erreur POST score:', error);
@@ -92,7 +92,7 @@ router.get('/:id/leaderboard', async (req, res) => {
     const gameId = req.params.id;
     const limit = parseInt(req.query.limit) || 50;
 
-    const leaderboard = await HighScore.findAll({
+    const leaderboard = await Highscore.findAll({
       where: { id_game: gameId },
       include: [
         {
@@ -126,7 +126,7 @@ router.get('/:id/leaderboard', async (req, res) => {
 // ============================================
 router.get('/:id/my-score', authenticateToken, async (req, res) => {
   try {
-    const highScore = await HighScore.findOne({
+    const highScore = await Highscore.findOne({
       where: {
         id_user: req.user.id,
         id_game: req.params.id,

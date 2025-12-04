@@ -127,8 +127,8 @@ CREATE TABLE Games (
   updatedAt TIMESTAMP
 );
 
--- HighScore: Many-to-many junction with scores
-CREATE TABLE HighScore (
+-- Highscore: Many-to-many junction with scores
+CREATE TABLE Highscore (
   id_user INT NOT NULL,
   id_game INT NOT NULL,
   score INT NOT NULL,
