@@ -193,7 +193,7 @@ const HighScore = sequelize.define(
 //       type: DataTypes.INTEGER,
 //       allowNull: false,
 //       references: {
-//         model: 'Users',
+//         model: 'User',
 //         key: 'id',
 //       },
 //     },
@@ -228,12 +228,12 @@ const HighScore = sequelize.define(
 User.belongsToMany(Game, {
   through: HighScore,
   foreignKey: 'id_user',
-  as: 'games',
+  as: 'user',
 });
 Game.belongsToMany(User, {
   through: HighScore,
   foreignKey: 'id_game',
-  as: 'users',
+  as: 'game',
 });
 
 // User.hasMany(UserAchievement, { foreignKey: 'userId', as: 'achievements' });
