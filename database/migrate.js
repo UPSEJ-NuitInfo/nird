@@ -10,13 +10,8 @@ const migrate = async () => {
     console.log('✅ Migration terminée avec succès !');
     console.log('📊 Tables créées :');
     console.log('   - Users');
-    console.log('   - GameTypes');
-    console.log('   - Lessons');
-    console.log('   - Exercises');
-    console.log('   - UserProgresses');
-    console.log('   - ExerciseAttempts');
-    console.log('   - Achievements');
-    console.log('   - UserAchievements');
+    console.log('   - Games');
+    console.log('   - Highscores');
 
     process.exit(0);
   } catch (error) {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Game, Highscore, User } = require('../database/models');
-const { authenticateToken } = require('./auth_new');
+const { Game, HighScore, User } = require('../database/models');
+const { authenticateToken } = require('./auth');
 
 // ============================================
 // GET /api/games - Liste tous les jeux

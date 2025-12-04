@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Highscore, Game, User } = require('../database/models');
-const { authenticateToken } = require('./auth_new');
+const { HighScore, Game, User } = require('../database/models');
+const { authenticateToken } = require('./auth');
 
 // ============================================
 // GET /api/users/:id/scores - Tous les scores d'un utilisateur

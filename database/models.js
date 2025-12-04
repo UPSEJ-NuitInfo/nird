@@ -26,22 +26,6 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    // totalXP: {
-    //   type: DataTypes.INTEGER,
-    //   defaultValue: 0,
-    // },
-    // currentStreak: {
-    //   type: DataTypes.INTEGER,
-    //   defaultValue: 0,
-    // },
-    // longestStreak: {
-    //   type: DataTypes.INTEGER,
-    //   defaultValue: 0,
-    // },
-    // lastActiveDate: {
-    //   type: DataTypes.DATEONLY,
-    //   allowNull: true,
-    // },
   },
   {
     timestamps: true,
@@ -80,22 +64,6 @@ const Game = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    // description: {
-    //   type: DataTypes.TEXT,
-    //   allowNull: true,
-    // },
-    // icon: {
-    //   type: DataTypes.STRING(50),
-    //   defaultValue: 'fa-gamepad',
-    // },
-    // xpReward: {
-    //   type: DataTypes.INTEGER,
-    //   defaultValue: 10,
-    // },
-    // isActive: {
-    //   type: DataTypes.BOOLEAN,
-    //   defaultValue: true,
-    // },
   },
   {
     timestamps: true,
@@ -135,115 +103,26 @@ const Highscore = sequelize.define(
 );
 
 // ============================================
-// MODÈLE ACHIEVEMENT (Succès/Badges)
-// ============================================
-// const Achievement = sequelize.define(
-//   'Achievement',
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     code: {
-//       type: DataTypes.STRING(50),
-//       allowNull: false,
-//       unique: true,
-//     },
-//     name: {
-//       type: DataTypes.STRING(100),
-//       allowNull: false,
-//     },
-//     description: {
-//       type: DataTypes.TEXT,
-//     },
-//     icon: {
-//       type: DataTypes.STRING(255),
-//     },
-//     tier: {
-//       type: DataTypes.ENUM('bronze', 'silver', 'gold', 'platinum'),
-//       defaultValue: 'bronze',
-//     },
-//     requirement: {
-//       type: DataTypes.JSON,
-//       // {type: "xp", value: 500} ou {type: "streak", value: 7} etc.
-//     },
-//     xpBonus: {
-//       type: DataTypes.INTEGER,
-//       defaultValue: 0,
-//     },
-//   },
-//   {
-//     timestamps: true,
-//   },
-// );
-
-// ============================================
-// MODÈLE USER ACHIEVEMENT (Badges obtenus)
-// ============================================
-// const UserAchievement = sequelize.define(
-//   'UserAchievement',
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     userId: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       references: {
-//         model: 'User',
-//         key: 'id',
-//       },
-//     },
-//     achievementId: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       references: {
-//         model: 'Achievements',
-//         key: 'id',
-//       },
-//     },
-//     unlockedAt: {
-//       type: DataTypes.DATE,
-//       defaultValue: DataTypes.NOW,
-//     },
-//   },
-//   {
-//     timestamps: true,
-//     indexes: [
-//       {
-//         unique: true,
-//         fields: ['userId', 'achievementId'],
-//       },
-//     ],
-//   },
-// );
-
-// ============================================
 // RELATIONS
 // ============================================
 
 User.belongsToMany(Game, {
   through: Highscore,
   foreignKey: 'id_user',
-  as: 'user',
+  as: 'games',
 });
 Game.belongsToMany(User, {
   through: Highscore,
   foreignKey: 'id_game',
-  as: 'game',
+  as: 'users',
 });
 
-// User.hasMany(UserAchievement, { foreignKey: 'userId', as: 'achievements' });
-// UserAchievement.belongsTo(User, { foreignKey: 'userId' });
+Highscore.belongsTo(User, { foreignKey: 'id_user', as: 'user' });
+Highscore.belongsTo(Game, { foreignKey: 'id_game', as: 'game' });
 
 module.exports = {
   sequelize,
   User,
   Game,
   Highscore,
-  // Achievement,
-  // UserAchievement,
 };
