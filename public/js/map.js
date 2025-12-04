@@ -2,73 +2,67 @@
 // NIRD Academy - Candy Map Logic
 // ===================================
 
-// Configuration des niveaux
+// Configuration des niveaux (Mise à jour : 5 mini-jeux)
 const levels = [
-    {
-        id: 1,
-        name: "Dino Google",
-        description: "Esquivez les obstacles et progressez dans le jeu du dinosaure",
-        icon: "🦖"
-    },
-    {
-        id: 2,
-        name: "Snake",
-        description: "Guidez le serpent sans qu'il se heurte",
-        icon: "🐍"
-    },
-    {
-        id: 3,
-        name: "Pokémon",
-        description: "Attrapez tous les Pokémons de cette région",
-        icon: "⚡"
-    },
-    {
-        id: 4,
-        name: "Flappy Bird",
-        description: "Naviguez entre les tuyaux avec grâce",
-        icon: "🐦"
-    },
-    {
-        id: 5,
-        name: "Tetris",
-        description: "Arrangez les blocs pour compléter les lignes",
-        icon: "🧱"
-    },
-    {
-        id: 6,
-        name: "Platformer",
-        description: "Sautez d'une plateforme à l'autre",
-        icon: "🎮"
-    }
+    { id: 1, name: 'Dino', description: 'Le jeu du dinosaure (canard)', icon: '🦖' },
+    { id: 2, name: 'Fruit Ninja', description: 'Tranchez les fruits', icon: '🍉' },
+    { id: 3, name: 'Guitar Hero', description: 'Suivez le rythme', icon: '🎸' },
+    { id: 4, name: 'Taupe Taupe', description: 'Attrapez les taupes (placeholder)', icon: '🐹' },
+    { id: 5, name: 'Laser Game', description: 'Course laser (placeholder)', icon: '🔫' }
 ];
 
 // État du jeu
 let gameState = {
     currentLevel: 1,
     completedLevels: [],
-    xp: 0
+    // xp removed
 };
 
 let currentUser = null;
 let leaderboardData = [];
 let pendingLevelScore = 0; // score achieved on last completed level
 let pendingLevelId = null; // level id just completed
+let levelThresholds = {}; // loaded from public/data/level_thresholds.json
 
-// Positions des niveaux (adaptées à la map)
+// Positions des niveaux (adaptées à la map) — 5 niveaux
 const levelPositions = [
-    { x: 50, y: 480 },
-    { x: 180, y: 360 },
-    { x: 310, y: 420 },
-    { x: 440, y: 280 },
-    { x: 570, y: 380 },
-    { x: 700, y: 300 }
+    { x: 60, y: 460 },
+    { x: 200, y: 360 },
+    { x: 340, y: 420 },
+    { x: 480, y: 300 },
+    { x: 620, y: 380 }
 ];
 
+// Mapping des jeux existants dans le dossier /jeux
+const gameFiles = {
+    1: '/jeux/canard.html',        // Dino -> canard.html
+    2: '/jeux/fruit-ninja.html',   // Fruit Ninja
+    3: '/jeux/guitar-hero.html'    // Guitar Hero
+    // 4 et 5 : pas de fichiers fournis, resteront placeholder
+};
+
 // ===== INITIALISATION =====
-function init() {
+async function init() {
+    await loadLevelThresholds();
     loadGameState();
     initMap();
     updateLevelInfo();
+}
+
+// Load per-level thresholds used to unlock progression
+async function loadLevelThresholds() {
+    try {
+        const res = await fetch('/data/level_thresholds.json');
+        if (res.ok) {
+            const json = await res.json();
+            levelThresholds = json || {};
+            return;
+        }
+    } catch (e) {
+        console.log('Impossible de charger level_thresholds.json, valeurs par défaut utilisées');
+    }
+    // fallback defaults if fetch fails
+    levelThresholds = { '1': 50, '2': 100, '3': 150, '4': 200, '5': 250 };
 }
 
 // ===== GESTION DE L'ÉTAT =====
@@ -180,7 +174,6 @@ function updateLevelInfo() {
 function updateStats() {
     document.getElementById('currentLevel').textContent = gameState.currentLevel;
     document.getElementById('completedCount').textContent = gameState.completedLevels.length + '/' + levels.length;
-    document.getElementById('xpCount').textContent = gameState.xp;
 }
 
 // ===== JOUER UN NIVEAU =====
@@ -188,36 +181,54 @@ function playLevel() {
     const levelId = gameState.currentLevel;
     const level = levels[levelId - 1];
 
-    alert(`🎮 Niveau ${levelId}: ${level.name}\n\nLe contenu du jeu sera intégré ici...`);
+    // If there's a real game file, open it in a new tab; otherwise show placeholder alert
+    const gameFile = gameFiles[levelId];
+    if (gameFile) {
+        try {
+            // Open the game in a new tab/window WITHOUT 'noopener' so the child can postMessage back to opener
+            window.open(gameFile, '_blank');
+        } catch (e) {
+            // fallback
+            alert(`🎮 Niveau ${levelId}: ${level.name}\n\n(Le jeu s'ouvrira dans un nouvel onglet)`);
+        }
+        // For real game files we wait for the child window to post back the score
+        return;
+    } else {
+        alert(`🎮 Niveau ${levelId}: ${level.name}\n\nLe contenu du jeu sera intégré ici...`);
+    }
 
     // Compléter le niveau
     if (!gameState.completedLevels.includes(levelId)) {
-        gameState.completedLevels.push(levelId);
         // simulate a level score (replace with real game score when available)
         const levelScore = 100 * levelId + Math.floor(Math.random() * 100); // placeholder score
         pendingLevelScore = levelScore;
         pendingLevelId = levelId;
-        // accumulate overall xp as before
-        gameState.xp += levelScore;
 
-        // Avancer au prochain niveau
-        if (levelId < levels.length) {
-            gameState.currentLevel = levelId + 1;
+        const threshold = parseInt(levelThresholds[levelId] || levelThresholds[String(levelId)] || 0, 10) || 0;
+        let unlocked = false;
+        if (levelScore >= threshold) {
+            // mark completed and advance
+            if (!gameState.completedLevels.includes(levelId)) {
+                gameState.completedLevels.push(levelId);
+            }
+            if (levelId < levels.length) {
+                gameState.currentLevel = Math.max(gameState.currentLevel, levelId + 1);
+            }
+            unlocked = true;
         }
 
         saveGameState();
         initMap();
         updateLevelInfo();
 
-        // If the user is already logged in, save score immediately for the completed level
+        // If the user is already logged in, save score immediately for the completed level (or partial score)
         setTimeout(() => {
             if (currentUser) {
-                // update stored user xp then automatically save score for existing user
-                currentUser.xp = gameState.xp;
                 localStorage.setItem('nirdUser', JSON.stringify(currentUser));
                 saveScoreForUser(currentUser, pendingLevelId, pendingLevelScore);
                 showLeaderboard(pendingLevelId);
-                alert(`✨ Score enregistré pour ${currentUser.username} (${pendingLevelScore})`);
+                if (unlocked) alert(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${pendingLevelScore})`);
+                else alert(`⚠️ Score enregistré (${pendingLevelScore}). Score minimum pour débloquer le niveau suivant: ${threshold}`);
             } else {
                 // otherwise open auth modal to register the score
                 openAuthModal();
@@ -234,7 +245,6 @@ function resetProgress() {
         gameState = {
             currentLevel: 1,
             completedLevels: [],
-            xp: 0
         };
         saveGameState();
         initMap();
@@ -283,7 +293,6 @@ async function submitAuth(event) {
         username,
         email,
         school,
-        xp: gameState.xp,
         completedLevels: gameState.completedLevels.length,
         level: levelId,
         score: levelScore,
@@ -339,8 +348,8 @@ async function showLeaderboard(levelId = null) {
         leaderboardData.push(currentUser);
     }
 
-    // Trier par score décroissant (fallback to xp if no score)
-    leaderboardData.sort((a, b) => (b.score || b.xp || 0) - (a.score || a.xp || 0));
+    // Trier par score décroissant
+    leaderboardData.sort((a, b) => (b.score || 0) - (a.score || 0));
 
     // Sauvegarder localement
     localStorage.setItem(key, JSON.stringify(leaderboardData));
@@ -375,8 +384,8 @@ function displayLeaderboard(levelId) {
             html += `<div class="leaderboard-rank">${index + 1}</div>`;
             html += `<div class="leaderboard-name">${user.username}</div>`;
             html += `<div class="leaderboard-school">${user.school || '-'}</div>`;
-            const displayScore = (user.score != null) ? `${user.score}` : `${user.xp} XP`;
-            html += `<div class="leaderboard-xp">${displayScore}</div>`;
+            const displayScore = (user.score != null) ? `${user.score}` : `-`;
+            html += `<div class="leaderboard-score">${displayScore}</div>`;
             html += '</div>';
         });
     }
@@ -398,7 +407,6 @@ function saveScoreForUser(user, levelId, levelScore) {
             email: user.email,
             school: user.school || '',
             score: levelScore,
-            xp: user.xp || 0,
             timestamp: now,
             level: levelId
         };
@@ -407,7 +415,6 @@ function saveScoreForUser(user, levelId, levelScore) {
         // update only if new score is better
         if ((levelScore || 0) > (entry.score || 0)) {
             entry.score = levelScore;
-            entry.xp = user.xp || entry.xp;
             entry.timestamp = now;
         }
     }
@@ -458,7 +465,6 @@ function renderProfileArea() {
         content.innerHTML = `
             <p><strong>Email:</strong><br>${currentUser.email}</p>
             <p><strong>École:</strong><br>${currentUser.school || '-'}</p>
-            <p><strong>XP:</strong> <strong style="color:var(--primary);">${currentUser.xp || 0}</strong></p>
         `;
         panel.appendChild(content);
 
@@ -530,7 +536,6 @@ function openProfileModal() {
             <p><strong>Pseudo:</strong> ${currentUser.username}</p>
             <p><strong>Email:</strong> ${currentUser.email}</p>
             <p><strong>École:</strong> ${currentUser.school || '-'}</p>
-            <p><strong>XP total:</strong> ${currentUser.xp || 0}</p>
         `;
     }
     modal.classList.remove('hidden');
@@ -623,4 +628,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } catch (e) {}
     init();
+});
+
+// Listen for scores posted by child game windows (via window.open)
+window.addEventListener('message', (e) => {
+    try {
+        const data = e.data;
+        if (!data || data.type !== 'nird-game-score') return;
+        const lvl = parseInt(data.level, 10);
+        const sc = parseInt(data.score, 10) || 0;
+
+        // set pending values so auth modal can prefill
+        pendingLevelId = lvl;
+        pendingLevelScore = sc;
+
+        const threshold = parseInt(levelThresholds[lvl] || levelThresholds[String(lvl)] || 0, 10) || 0;
+        let unlocked = false;
+        // mark level completed locally only if score meets threshold
+        if (sc >= threshold) {
+            if (!gameState.completedLevels.includes(lvl)) {
+                gameState.completedLevels.push(lvl);
+            }
+            if (lvl < levels.length) {
+                gameState.currentLevel = Math.max(gameState.currentLevel, lvl + 1);
+            }
+            saveGameState();
+            initMap();
+            updateLevelInfo();
+            unlocked = true;
+        }
+
+        // If user logged in, save immediately; otherwise open auth modal
+        if (currentUser) {
+            localStorage.setItem('nirdUser', JSON.stringify(currentUser));
+            saveScoreForUser(currentUser, lvl, sc);
+            showLeaderboard(lvl);
+            if (unlocked) alert(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`);
+            else alert(`⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`);
+        } else {
+            openAuthModal();
+        }
+    } catch (err) {
+        console.log('Erreur en traitant le message du jeu', err);
+    }
 });

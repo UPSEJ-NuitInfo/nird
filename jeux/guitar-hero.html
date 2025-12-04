@@ -458,6 +458,20 @@
             setTimeout(() => boom.remove(), 200);
         }
 
+        // Allow manual finish: send current score to opener and close
+        function sendScoreAndClose() {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'nird-game-score', level: 3, score: score }, '*');
+                }
+            } catch (e) {}
+            try { window.close(); } catch (e) {}
+        }
+
     </script>
+        <!-- Floating finish control -->
+        <div style="position:fixed; right:16px; top:16px; z-index:200;">
+            <button onclick="sendScoreAndClose()" style="padding:8px 12px; font-size:14px;">Terminer et retourner</button>
+        </div>
 </body>
 </html>

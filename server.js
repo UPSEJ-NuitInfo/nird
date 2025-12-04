@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+// Serve the jeux folder so game HTML files are available at /jeux/...
+app.use('/jeux', express.static(path.join(__dirname, 'jeux')));
 
 // API Calculator
 app.post('/api/calculate', (req, res) => {
