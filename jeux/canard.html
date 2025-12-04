@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Canard vs GAFAM</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* Pour empiler le titre et le jeu */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #87CEEB; /* Ciel Bleu */
+            font-family: Verdana, sans-serif; /* Police système standard */
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Le Titre centré */
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 0px #333;
+            font-size: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #jeu-container {
+            position: relative;
+            width: 800px;
+            height: 300px;
+            background-color: #f0f0f0;
+            border-bottom: 15px solid #8B4513; /* Terre */
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        /* Le Canard Jaune */
+        #canard {
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            font-size: 50px;
+            height: 50px;
+            width: 50px;
+            z-index: 2;
+        }
+
+        /* Animation de marche (dandinement) */
+        .marche {
+            animation: dandinement 0.3s infinite alternate;
+        }
+
+        @keyframes dandinement {
+            from { transform: rotate(-10deg); }
+            to { transform: rotate(10deg); }
+        }
+
+        /* Animation de saut (rotation) */
+        .saut-anim {
+            animation: rotationSaut 0.5s;
+        }
+
+        @keyframes rotationSaut {
+            0% { transform: rotate(-20deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Obstacles GAFAM */
+        .obstacle {
+            position: absolute;
+            bottom: 0;
+            font-size: 30px; 
+            font-weight: bold;
+            z-index: 1;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        /* Nuages déco */
+        .nuage {
+            position: absolute;
+            top: 30px;
+            font-size: 60px;
+            opacity: 0.7;
+            animation: bougeNuage 10s linear infinite;
+        }
+
+        @keyframes bougeNuage {
+            from { left: 800px; }
+            to { left: -100px; }
+        }
+
+        /* Score */
+        #score {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        /* Écran de fin */
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 4px solid #FFD700;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            color: #333;
+        }
+        button:hover { background-color: #ffcc00; }
+
+    </style>
+</head>
+<body>
+
+    <h1>CANARD vs GAFAM</h1>
+
+    <div id="jeu-container">
+        <div id="score">0</div>
+        
+        <div id="canard" class="marche">🦆</div>
+        
+        <div class="nuage" style="top: 20px; animation-duration: 8s;">☁️</div>
+        <div class="nuage" style="top: 60px; animation-duration: 12s; opacity: 0.4;">☁️</div>
+
+        <div id="game-over">
+            <h1 style="margin: 0; color: #333; font-size: 30px;">Racheté ! 💸</h1>
+            <p>Score final : <span id="score-final">0</span></p>
+            <button onclick="relancerJeu()">RÉSISTER</button>
+        </div>
+    </div>
+
+    <script>
+        const canard = document.getElementById("canard");
+        const container = document.getElementById("jeu-container");
+        const scoreDiv = document.getElementById("score");
+        const gameOverDiv = document.getElementById("game-over");
+        const scoreFinalSpan = document.getElementById("score-final");
+
+        let estEnSaut = false;
+        let jeuFini = false;
+        let score = 0;
+        let obstacles = [];
+        let vitesse = 8;
+        
+        // Liste des ennemis GAFAM
+        const GAFAM = ["G", "🍎", "📘", "📦", "🪟"];
+        const COULEURS_GAFAM = ["#4285F4", "#555555", "#1877F2", "#FF9900", "#00A4EF"];
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === "Space" || e.code === "ArrowUp") && !jeuFini) sauter();
+        });
+        container.addEventListener('click', () => {
+            if (!jeuFini) sauter();
+        });
+
+        function sauter() {
+            if (estEnSaut) return;
+            estEnSaut = true;
+            canard.classList.remove("marche");
+            canard.classList.add("saut-anim");
+
+            let position = 0;
+            let montee = setInterval(() => {
+                if (position >= 130) {
+                    clearInterval(montee);
+                    let descente = setInterval(() => {
+                        if (position <= 0) {
+                            clearInterval(descente);
+                            estEnSaut = false;
+                            position = 0;
+                            canard.style.bottom = position + 'px';
+                            if (!jeuFini) {
+                                canard.classList.remove("saut-anim");
+                                canard.classList.add("marche");
+                            }
+                        } else {
+                            position -= 5;
+                            canard.style.bottom = position + 'px';
+                        }
+                    }, 20);
+                } else {
+                    position += 8;
+                    canard.style.bottom = position + 'px';
+                }
+            }, 20);
+        }
+
+        function creerObstacle() {
+            if (jeuFini) return;
+
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            
+            const index = Math.floor(Math.random() * GAFAM.length);
+            obstacle.innerText = GAFAM[index];
+            obstacle.style.color = COULEURS_GAFAM[index];
+            
+            obstacle.style.left = '800px';
+            container.appendChild(obstacle);
+            obstacles.push(obstacle);
+
+            let positionObstacle = 800;
+            let timerObstacle = setInterval(() => {
+                if (jeuFini) {
+                    clearInterval(timerObstacle);
+                    return;
+                }
+
+                if (positionObstacle < -50) {
+                    obstacle.remove();
+                    clearInterval(timerObstacle);
+                    score++;
+                    scoreDiv.innerText = score;
+                    if(score % 5 === 0) vitesse += 0.5;
+                } else {
+                    positionObstacle -= vitesse;
+                    obstacle.style.left = positionObstacle + 'px';
+                }
+
+                let canardRect = canard.getBoundingClientRect();
+                let obstacleRect = obstacle.getBoundingClientRect();
+
+                if (
+                    canardRect.right > obstacleRect.left + 15 &&
+                    canardRect.left < obstacleRect.right - 15 &&
+                    canardRect.bottom > obstacleRect.top + 10
+                ) {
+                    finDuJeu(); 
+                }
+
+            }, 20);
+
+            let tempsAleatoire = Math.random() * 1500 + 1000;
+            if (!jeuFini) setTimeout(creerObstacle, tempsAleatoire);
+        }
+
+        function finDuJeu() {
+            jeuFini = true;
+            canard.innerText = "💰"; 
+            canard.classList.remove("marche");
+            canard.classList.remove("saut-anim");
+            scoreFinalSpan.innerText = score;
+            gameOverDiv.style.display = "block";
+        }
+
+        function relancerJeu() {
+            document.querySelectorAll('.obstacle').forEach(e => e.remove());
+            obstacles = [];
+            jeuFini = false;
+            score = 0;
+            vitesse = 8;
+            scoreDiv.innerText = "0";
+            gameOverDiv.style.display = "none";
+            canard.innerText = "🦆";
+            canard.style.bottom = "0px";
+            canard.classList.add("marche");
+            creerObstacle();
+        }
+
+        creerObstacle();
+    </script>
+</body>
+</html>
