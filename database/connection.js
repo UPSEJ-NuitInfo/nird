@@ -17,7 +17,6 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   port: dbPort,
   dialect: 'mariadb',
   dialectOptions: {
-    timezone: 'Europe/Paris',
     connectTimeout: 10000,
   },
   pool: {
