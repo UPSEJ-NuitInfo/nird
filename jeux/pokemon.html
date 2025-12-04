@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Canard vs GAFAM</title>
+    <style>
+        /* STYLE RETRO */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-color: #202020;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px; /* Texte plus petit par défaut */
+            user-select: none;
+        }
+
+        #gameboy {
+            width: 600px;
+            background-color: #f8f8f8;
+            border: 15px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .battle-scene {
+            height: 250px;
+            background: linear-gradient(to bottom, #87CEEB 60%, #90EE90 40%);
+            position: relative;
+        }
+
+        /* SPRITES */
+        .sprite { position: absolute; font-size: 70px; transition: transform 0.2s; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.2)); }
+        #enemy-sprite { top: 30px; right: 50px; }
+        #player-sprite { bottom: 20px; left: 50px; transform: scaleX(-1); }
+
+        /* ANIMATIONS */
+        .shake { animation: shake 0.5s; }
+        .attack-anim { animation: lunge 0.3s; }
+        .blink { animation: blink 0.2s 3; }
+        @keyframes shake { 0%, 100% {transform:translateX(0);} 25% {transform:translateX(-10px);} 75% {transform:translateX(10px);} }
+        @keyframes lunge { 50% { transform: scaleX(-1) translate(-30px, -30px); } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* HUD */
+        .hud {
+            position: absolute;
+            background: #fff;
+            border: 3px solid #333;
+            border-radius: 5px;
+            padding: 8px;
+            width: 180px;
+        }
+        #enemy-hud { top: 20px; left: 20px; }
+        #player-hud { bottom: 30px; right: 20px; }
+
+        .hp-bar-bg { width: 100%; height: 10px; background: #ddd; border: 2px solid #333; margin-top: 5px; }
+        .hp-bar { height: 100%; background: #4CAF50; width: 100%; transition: width 0.5s; }
+
+        /* CONTROLES */
+        .controls {
+            height: 140px;
+            background: #333;
+            color: #fff;
+            display: flex;
+            border-top: 5px solid #000;
+        }
+        #dialog-box {
+            width: 55%;
+            padding: 15px;
+            border-right: 5px solid #000;
+            line-height: 1.6;
+            overflow: hidden; /* Empêche le débordement */
+        }
+        #actions {
+            width: 45%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px;
+        }
+        button {
+            font-family: inherit;
+            font-size: 9px; /* Texte bouton petit */
+            background: #f8f8f8;
+            border: 3px solid #aaa;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 3px 0 #555;
+        }
+        button:hover { background: #ffeaa7; margin-top: 1px; box-shadow: 0 2px 0 #555; }
+        button:active { margin-top: 3px; box-shadow: none; }
+        button:disabled { background: #555; color: #888; border-color: #444; box-shadow: none; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div id="gameboy">
+        <div class="battle-scene">
+            <div id="enemy-hud" class="hud">
+                <div id="enemy-name">GAFAM</div>
+                <div class="hp-bar-bg"><div id="enemy-hp-bar" class="hp-bar"></div></div>
+            </div>
+            <div id="enemy-sprite" class="sprite">👾</div>
+
+            <div id="player-hud" class="hud">
+                <div>CanardOS</div>
+                <div class="hp-bar-bg"><div id="player-hp-bar" class="hp-bar"></div></div>
+                <div style="text-align: right; margin-top:3px;"><span id="player-hp-text">100</span> PV</div>
+            </div>
+            <div id="player-sprite" class="sprite">🦆</div>
+        </div>
+
+        <div class="controls">
+            <div id="dialog-box">Un GOOGLE sauvage apparaît !</div>
+            <div id="actions">
+                <button onclick="attaque('rgpd')">RGPD Beam</button>
+                <button onclick="attaque('open_source')">Open Source</button>
+                <button onclick="attaque('vpn')">Soin VPN</button>
+                <button onclick="log('Fuite impossible !')" style="color:#d32f2f;">Fuir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const player = { maxHp: 100, hp: 100 };
+        const enemies = [
+            { name: "Google", sprite: "👁️", maxHp: 40, hp: 40, atkName: "Traqueur", dmg: 10 },
+            { name: "Facebook", sprite: "📘", maxHp: 50, hp: 50, atkName: "FakeNews", dmg: 15 },
+            { name: "Amazon", sprite: "📦", maxHp: 60, hp: 60, atkName: "Drone", dmg: 18 },
+            { name: "Microsoft", sprite: "🪟", maxHp: 70, hp: 70, atkName: "BSOD", dmg: 20 },
+            { name: "Apple", sprite: "🍎", maxHp: 90, hp: 90, atkName: "iPrix", dmg: 25 }
+        ];
+
+        let enemyIdx = 0;
+        let currEnemy = { ...enemies[0] };
+        let turn = true; // true = joueur
+
+        function updateUI() {
+            document.getElementById("enemy-name").innerText = currEnemy.name;
+            document.getElementById("enemy-sprite").innerText = currEnemy.sprite;
+            document.getElementById("player-hp-text").innerText = player.hp;
+
+            const pPct = (player.hp / player.maxHp) * 100;
+            const ePct = (currEnemy.hp / currEnemy.maxHp) * 100;
+
+            document.getElementById("player-hp-bar").style.width = pPct + "%";
+            document.getElementById("enemy-hp-bar").style.width = ePct + "%";
+        }
+
+        function log(msg) {
+            const box = document.getElementById("dialog-box");
+            box.innerText = "";
+            let i = 0;
+            const t = setInterval(() => {
+                box.innerText += msg.charAt(i++);
+                if(i > msg.length) clearInterval(t);
+            }, 15);
+        }
+
+        function toggleBtns(on) {
+            document.querySelectorAll("button").forEach(b => b.disabled = !on);
+        }
+
+        function attaque(type) {
+            if(!turn) return;
+            turn = false; toggleBtns(false);
+
+            let dmg = 0, msg = "";
+            const pSprite = document.getElementById("player-sprite");
+            pSprite.classList.add("attack-anim");
+            setTimeout(() => pSprite.classList.remove("attack-anim"), 300);
+
+            if(type === 'rgpd') { dmg = Math.floor(Math.random()*10)+15; msg = "Canard utilise RGPD !"; }
+            else if(type === 'open_source') { dmg = 10; msg = "Code libre envoyé !"; }
+            else if(type === 'vpn') { 
+                player.hp = Math.min(player.maxHp, player.hp+20); 
+                log("VPN activé : +20 PV"); updateUI(); 
+                setTimeout(tourEnnemi, 1500); return; 
+            }
+
+            log(msg);
+            setTimeout(() => {
+                currEnemy.hp = Math.max(0, currEnemy.hp - dmg);
+                const eSprite = document.getElementById("enemy-sprite");
+                eSprite.classList.add("blink");
+                setTimeout(() => eSprite.classList.remove("blink"), 600);
+                updateUI();
+
+                if(currEnemy.hp <= 0) victoire();
+                else setTimeout(tourEnnemi, 1500);
+            }, 1000);
+        }
+
+        function tourEnnemi() {
+            log(`${currEnemy.name} attaque : ${currEnemy.atkName} !`);
+            document.getElementById("enemy-sprite").classList.add("shake");
+            setTimeout(() => document.getElementById("enemy-sprite").classList.remove("shake"), 500);
+
+            setTimeout(() => {
+                const dmg = Math.floor(currEnemy.dmg * (Math.random()*0.4 + 0.8));
+                player.hp = Math.max(0, player.hp - dmg);
+                updateUI();
+
+                if(player.hp <= 0) {
+                    log("CanardOS a crashé... (Perdu)");
+                    document.getElementById("player-sprite").innerText = "💀";
+                } else {
+                    turn = true; toggleBtns(true); log("À votre tour !");
+                }
+            }, 1000);
+        }
+
+        function victoire() {
+            log(`${currEnemy.name} a planté !`);
+            enemyIdx++;
+            if(enemyIdx >= enemies.length) {
+                setTimeout(() => {
+                    document.getElementById("enemy-sprite").innerText = "🏆";
+                    log("INTERNET EST SAUVÉ !");
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    currEnemy = { ...enemies[enemyIdx] };
+                    log(`Un ${currEnemy.name} apparaît !`);
+                    updateUI();
+                    turn = true; toggleBtns(true);
+                }, 2000);
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
