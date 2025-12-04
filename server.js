@@ -37,6 +37,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Route Candy Map
+app.get('/map', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'map.html'));
+});
+
 // Démarrage serveur
 app.listen(PORT, () => {
   console.log(`🚀 Serveur NIRD lancé sur http://localhost:${PORT}`);
