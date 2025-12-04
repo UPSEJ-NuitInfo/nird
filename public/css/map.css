@@ -738,11 +738,7 @@ body {
   font-size: 0.9em;
 }
 
-.leaderboard-xp {
-  text-align: right;
-  font-weight: 700;
-  color: var(--accent);
-}
+
 
 @media (max-width: 768px) {
   .map-header h1 {

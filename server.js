@@ -13,6 +13,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+// Serve the jeux folder so game HTML files are available at /jeux/...
+app.use('/jeux', express.static(path.join(__dirname, 'jeux')));
 
 // API Routes - Système simplifié (Users, Games, Highscore)
 const { router: authRouter } = require('./api/auth');

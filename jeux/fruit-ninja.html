@@ -69,7 +69,10 @@
     <div id="game-over">
         <h1>GAME OVER</h1>
         <p>Score final : <span id="final-score">0</span></p>
-        <button onclick="startGame()">REJOUER</button>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button onclick="startGame()">REJOUER</button>
+            <button onclick="sendScoreAndClose()">Retour à la map</button>
+        </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -244,6 +247,12 @@
             gameRunning = false;
             document.getElementById('final-score').innerText = score;
             document.getElementById('game-over').style.display = 'block';
+            // send score to opener
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'nird-game-score', level: 2, score: score }, '*');
+                }
+            } catch(e) {}
         }
 
         function updateUI() {
@@ -362,6 +371,15 @@
 
         // Démarrage initial
         startGame();
+
+        function sendScoreAndClose() {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'nird-game-score', level: 2, score: score }, '*');
+                }
+            } catch (e) {}
+            try { window.close(); } catch (e) {}
+        }
 
     </script>
 </body>
