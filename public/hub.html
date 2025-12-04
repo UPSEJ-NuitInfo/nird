@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIRD Games - Hub</title>
+    <link rel="stylesheet" href="/css/hub.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">NIRD Games</h1>
+        <div class="user-info">
+          <span class="username" id="username">Utilisateur</span>
+          <button class="btn-logout" id="logout-btn">Déconnexion</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+      <h2 class="page-title">Mini-Jeux</h2>
+      <p class="page-subtitle">Choisissez un jeu et défiez le classement !</p>
+
+      <!-- Loading State -->
+      <div id="loading" class="loading">
+        <p>Chargement des jeux...</p>
+      </div>
+
+      <!-- Games Grid -->
+      <div id="games-grid" class="games-grid" style="display: none"></div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none">
+        <div class="empty-icon">🎮</div>
+        <h3 class="empty-title">Aucun jeu disponible</h3>
+        <p class="empty-description">
+          Les jeux seront bientôt disponibles. Revenez plus tard !
+        </p>
+      </div>
+    </main>
+
+    <script src="/js/hub.js"></script>
+  </body>
+</html>
