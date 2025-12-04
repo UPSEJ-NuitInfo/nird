@@ -150,7 +150,10 @@
         <div id="game-over">
             <h1 style="margin: 0; color: #333; font-size: 30px;">Racheté ! 💸</h1>
             <p>Score final : <span id="score-final">0</span></p>
-            <button onclick="relancerJeu()">RÉSISTER</button>
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button onclick="relancerJeu()">RÉSISTER</button>
+                <button onclick="sendScoreAndClose()">Retour à la map</button>
+            </div>
         </div>
     </div>
 
@@ -266,6 +269,12 @@
             canard.classList.remove("saut-anim");
             scoreFinalSpan.innerText = score;
             gameOverDiv.style.display = "block";
+            // Send score to opener (map) if opened from there
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'nird-game-score', level: 1, score: score }, '*');
+                }
+            } catch (e) { /* ignore */ }
         }
 
         function relancerJeu() {
@@ -280,6 +289,16 @@
             canard.style.bottom = "0px";
             canard.classList.add("marche");
             creerObstacle();
+        }
+
+        function sendScoreAndClose() {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'nird-game-score', level: 1, score: score }, '*');
+                }
+            } catch (e) { }
+            // close the window (works when opened via window.open)
+            try { window.close(); } catch (e) { /* ignore */ }
         }
 
         creerObstacle();

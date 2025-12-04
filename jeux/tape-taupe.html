@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Whack-a-GAFAM</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --accent:#f59e0b;
+    --text:#e6eef8;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--bg),#071029);
+    color:var(--text);
+    font-family:Inter,system-ui,Arial,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  .game {
+  position: relative;
+    width:900px;
+    max-width:95vw;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(2,6,23,0.6);
+    padding:18px;
+  }
+
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .scoreboard {display:flex; gap:12px; align-items:center;}
+  .badge{
+    background:rgba(255,255,255,0.03);
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:600;
+  }
+
+  .arena{
+    position:relative;
+    width:100%;
+    height:520px;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.02), transparent 20%),
+      linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.05));
+    border-radius:10px;
+    overflow:hidden;
+    user-select:none;
+    cursor: none; /* on masque le curseur normal, on affiche notre marteau */
+  }
+
+  /* positions possibles (grid-like) */
+  .hole{
+    position:absolute;
+    width:120px;
+    height:120px;
+    left:0; top:0;
+    transform:translate(-50%,-50%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none; /* click handled by target */
+  }
+
+  .target {
+    pointer-events:auto;
+    width:84px;
+    height:84px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:42px;
+    transform:translateY(70px) scale(0.7);
+    transition:transform 180ms cubic-bezier(.2,.9,.2,1), opacity 150ms;
+    opacity:0;
+    background:linear-gradient(180deg,#0b1220,#0f1724);
+    border:2px solid rgba(255,255,255,0.03);
+    box-shadow:0 6px 18px rgba(2,6,23,0.5), inset 0 -6px 18px rgba(0,0,0,0.4);
+    
+    /* MODIFICATION ICI : Suppression du cursor url orange et suppression du highlight mobile */
+    cursor: none; 
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .target.show{
+    transform:translateY(0) scale(1);
+    opacity:1;
+  }
+
+  /* hammer (cursor) */
+  .hammer{
+    position:fixed;
+    width:100px;
+    height:100px;
+    pointer-events:none;
+    /* Point d'origine au centre de la tête du marteau */
+    transform-origin: 50% 25%;
+    transition:transform 80ms linear;
+    z-index:9999;
+    mix-blend-mode:screen;
+  }
+  .hammer img{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+  /* Animation d'écrasement (scale) au lieu de rotation */
+  .hammer.hit{ transform: scale(0.85); transition:transform 80ms ease-out; }
+
+.legend {
+  position: absolute;
+  right: -140px;
+  top: 20px;
+  background: rgba(255,255,255,0.06);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 22px;
+  width: 120px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+}
+
+.legend-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-item .icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+  /* small screens */
+  @media (max-width:640px){
+    .arena{height:420px;}
+    .target{width:70px;height:70px;font-size:30px;}
+    .hole{width:90px;height:90px;}
+  }
+
+  .hud {
+    margin-top:12px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .controls button{
+    background:var(--accent);
+    border:none;
+    color:#081222;
+    padding:8px 12px;
+    border-radius:8px;
+    font-weight:700;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="game">
+      <div class="legend">
+    <div class="legend-title">GAFAM :</div>
+    <div class="legend-item"><span class="icon">🌐</span> Google (1 clic)</div>
+    <div class="legend-item"><span class="icon">🍎</span> Apple (2 clics)</div>
+    <div class="legend-item"><span class="icon">Ⓜ️</span> Meta (3 clics)</div>
+    <div class="legend-item"><span class="icon">📦</span> Amazon (4 clics)</div>
+    <div class="legend-item"><span class="icon">💻</span> Microsoft (5 clics)</div>
+      </div>
+      <div class="header">
+      <div>
+        <h2 style="margin:0 0 6px 0">Whack-a-GAFAM</h2>
+        <div style="opacity:.75; font-size:13px">Écrase les géants du web avant qu'ils ne disparaissent !</div>
+      </div>
+      <div class="scoreboard">
+        <div class="badge">Score: <span id="score">0</span></div>
+        <div class="badge">Vies: <span id="lives">5</span></div>
+        <div class="badge">Temps: <span id="time">60</span>s</div>
+      </div>
+    </div>
+
+    <div class="arena" id="arena"></div>
+
+    <div class="hud">
+      <div class="controls">
+        <button id="startBtn">Démarrer</button>
+        <button id="stopBtn">Arrêter</button>
+        <label style="margin-left:12px;font-size:13px;opacity:.85">Difficulté:
+          <select id="difficulty">
+            <option value="easy">Facile</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Difficile</option>
+          </select>
+        </label>
+      </div>
+      <div style="opacity:.8;font-size:13px">Astuce: clique et maintiens pour un coup rapide.</div>
+    </div>
+  </div>
+
+  <div class="hammer" id="hammer" aria-hidden="true">
+<img src="data:image/svg+xml;utf8,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+  <g>
+    <rect x='18' y='10' width='28' height='12' rx='2' fill='%23d1d5db'/>
+    <rect x='18' y='22' width='28' height='6' rx='2' fill='%23a1a1aa'/>
+    
+    <rect x='30' y='28' width='6' height='30' rx='3' fill='%232c3e50'/>
+
+    <rect x='26' y='52' width='14' height='8' rx='3' fill='%231f2937'/>
+  </g>
+</svg>" alt="marteau">
+
+  </div>
+
+<script>
+(() => {
+  const arena = document.getElementById('arena');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const scoreEl = document.getElementById('score');
+  const livesEl = document.getElementById('lives');
+  const timeEl = document.getElementById('time');
+  const hammer = document.getElementById('hammer');
+  const diffSelect = document.getElementById('difficulty');
+
+  let score = 0;
+  let lives = 5;
+  let timeLeft = 60;
+  let running = false;
+  let spawnInterval = null;
+  let timerInterval = null;
+  let holes = [];
+  let activeTargets = new Set();
+
+  function getRandomGAFAM() {
+  const allTypes = [
+    { icon: "🌐", hp: 1, name: "Google" },
+    { icon: "🍎", hp: 2, name: "Apple" },
+    { icon: "Ⓜ️", hp: 3, name: "Meta" },
+    { icon: "📦", hp: 4, name: "Amazon" },
+    { icon: "💻", hp: 5, name: "Microsoft" }
+  ];
+
+  const difficulty = diffSelect.value;
+  let typesToUse;
+
+  if (difficulty === 'easy') {
+    // Facile: Google (1 HP) et Apple (2 HP)
+    typesToUse = allTypes.slice(0, 2);
+  } else if (difficulty === 'normal') {
+    // Normal: Google (1 HP) à Amazon (4 HP)
+    typesToUse = allTypes.slice(0, 4);
+  } else {
+    // Difficile: Toutes les icônes
+    typesToUse = allTypes;
+  }
+
+  // Choix aléatoire parmi le sous-ensemble sélectionné
+  return typesToUse[Math.floor(Math.random() * typesToUse.length)];
+}
+
+  // Generate grid positions (holes)
+  function createHoles() {
+    holes = [];
+    const cols = 6;
+    const rows = 3;
+    const padX = 14; // percent
+    const padY = 12; // percent
+    for (let r=0;r<rows;r++){
+      for (let c=0;c<cols;c++){
+        const x = padX + (c/(cols-1))*(100 - padX*2);
+        const y = padY + (r/(rows-1))*(100 - padY*2);
+        holes.push({x,y});
+      }
+    }
+    // create hole elements (transparent anchors)
+    arena.innerHTML = '';
+    holes.forEach((pos,i) => {
+      const div = document.createElement('div');
+      div.className = 'hole';
+      div.style.left = pos.x + '%';
+      div.style.top = pos.y + '%';
+      div.dataset.idx = i;
+      arena.appendChild(div);
+    });
+  }
+
+function spawnTarget() {
+  const free = holes.map((h,i)=>i).filter(i => !activeTargets.has(i));
+  if (free.length === 0) return;
+
+  const idx = free[Math.floor(Math.random() * free.length)];
+  activeTargets.add(idx);
+
+  const holeEl = arena.querySelector('.hole[data-idx="'+idx+'"]');
+  const target = document.createElement('div');
+  target.className = 'target';
+
+  // Choisir type de GAFAM en fonction de la difficulté
+  const comp = getRandomGAFAM();
+  target.dataset.hp = comp.hp;
+  target.innerHTML = `<span class="icon">${comp.icon}</span>`;
+
+  target.dataset.hole = idx;
+
+  // Click handler
+  const hit = () => {
+    let hp = parseInt(target.dataset.hp);
+    hp--;
+
+    // petite animation de dégâts
+    target.style.transform = "translateY(0) scale(0.9)";
+    setTimeout(() => { target.style.transform = ""; }, 160);
+
+    if (hp > 0) {
+      target.dataset.hp = hp;
+      return; // pas détruit encore
+    }
+
+    score += comp.hp; // donner + de points selon HP original
+    scoreEl.textContent = score;
+
+    smashAnimationAt(target);
+    removeTarget(target, true);
+  };
+
+  target.addEventListener('click', hit);
+  holeEl.appendChild(target);
+
+  requestAnimationFrame(() => target.classList.add('show'));
+
+  // Durée d'apparition
+  const difficulty = diffSelect.value;
+  const visibleMs = difficulty === 'easy' ? 1800 :
+                    difficulty === 'hard' ? 1200 : 1500;
+
+  const timeout = setTimeout(() => {
+    if (document.body.contains(target) && target.classList.contains('show')) {
+      removeTarget(target, false);
+      loseLife();
+    }
+  }, visibleMs + Math.random() * 400);
+
+  target._timeout = timeout;
+}
+
+
+  function removeTarget(target, wasHit){
+    const idx = Number(target.dataset.hole);
+    activeTargets.delete(idx);
+    target.classList.remove('show');
+    clearTimeout(target._timeout);
+    // small fade then remove
+    setTimeout(()=> {
+      if (target.parentNode) target.parentNode.removeChild(target);
+    }, 220);
+  }
+
+  function loseLife(){
+    lives = Math.max(0, lives-1);
+    livesEl.textContent = lives;
+    if (lives <= 0) endGame();
+  }
+
+  function smashAnimationAt(el){
+    // brief scale/shake
+    el.style.transform = 'translateY(0) scale(0.92)';
+    setTimeout(()=>{ el.style.transform = ''; }, 160);
+    // hammer hit effect
+    hammer.classList.add('hit');
+    setTimeout(()=> hammer.classList.remove('hit'), 140);
+  }
+
+  // spawn loop according to difficulty
+  function startSpawning() {
+    clearInterval(spawnInterval);
+    const difficulty = diffSelect.value;
+    const rate = difficulty === 'easy' ? 850 : difficulty === 'hard' ? 430 : 650;
+    spawnInterval = setInterval(spawnTarget, rate);
+    // initial burst
+    for (let i=0;i<3;i++) setTimeout(spawnTarget, i*200);
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
+      timeLeft -= 1;
+      timeEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  function startGame(){
+    if (running) return;
+    running = true;
+    score = 0; lives = 5; timeLeft = 60;
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+    timeEl.textContent = timeLeft;
+    createHoles();
+    startSpawning();
+    startTimer();
+  }
+
+  function endGame(){
+    if (!running) return;
+    running = false;
+    clearInterval(spawnInterval);
+    clearInterval(timerInterval);
+    activeTargets.clear();
+    // remove targets
+    const targets = arena.querySelectorAll('.target');
+    targets.forEach(t => t.parentNode.removeChild(t));
+    setTimeout(()=> {
+      alert('Fin du jeu ! Score: ' + score);
+    }, 80);
+  }
+
+  // hammer position tracking
+  window.addEventListener('mousemove', (e)=>{
+    // Ajustement pour centrer la tête du marteau
+    hammer.style.left = (e.clientX - 50) + 'px';
+    hammer.style.top = (e.clientY - 25) + 'px';
+  });
+
+  // allow touch: map touch to hammer and clicks
+  window.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (t) {
+      hammer.style.left = (t.clientX - 50) + 'px';
+      hammer.style.top = (t.clientY - 25) + 'px';
+    }
+  }, {passive:true});
+
+  // simulate hammer down when clicking anywhere
+  window.addEventListener('mousedown', ()=> hammer.classList.add('hit'));
+  window.addEventListener('mouseup', ()=> hammer.classList.remove('hit'));
+  window.addEventListener('touchstart', ()=> hammer.classList.add('hit'));
+  window.addEventListener('touchend', ()=> hammer.classList.remove('hit'));
+
+  // start/stop
+  startBtn.addEventListener('click', startGame);
+  stopBtn.addEventListener('click', endGame);
+
+  // keyboard: space to smash nearest target under cursor
+  window.addEventListener('keydown',(e)=>{
+    if (e.code==='Space') {
+      const el = document.elementFromPoint(parseInt(hammer.style.left||0)+50, parseInt(hammer.style.top||0)+25);
+      if (el && el.classList.contains('target')) {
+        el.click();
+      }
+      e.preventDefault();
+    }
+  });
+
+  // init
+  createHoles();
+
+})();
+</script>
+</body>
+</html>
