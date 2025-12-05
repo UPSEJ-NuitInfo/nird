@@ -95,7 +95,8 @@ const gameFiles = {
   1: '/jeux/canard.html', // Dino -> canard.html
   2: '/jeux/fruit-ninja.html', // Fruit Ninja
   3: '/jeux/guitar-hero.html', // Guitar Hero
-  // 4 et 5 : pas de fichiers fournis, resteront placeholder
+  4: '/jeux/tape-taupe.html', // Taupe Taupe (Whack-a-GAFAM)
+  5: '/jeux/laser-game.html', // Laser Game (Moodle Defender)
 };
 
 // ===== INITIALISATION =====

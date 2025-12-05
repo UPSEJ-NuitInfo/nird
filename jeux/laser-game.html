@@ -115,7 +115,7 @@
         
         <div class="btn-container">
             <button onclick="startGame()">REJOUER</button>
-            <button class="secondary" onclick="showMenu()">RETOUR MENU</button>
+            <button class="secondary" id="returnMapBtn">RETOUR À LA MAP</button>
         </div>
     </div>
 
@@ -365,6 +365,15 @@
             document.getElementById('end-screen').style.display = 'flex';
             document.getElementById('ui').style.display = 'none';
             document.getElementById('final-score').innerText = score;
+            // Attach return to map button
+            const returnBtn = document.getElementById('returnMapBtn');
+            if (returnBtn) {
+                returnBtn.addEventListener('click', () => {
+                    try {
+                        window.location.href = `/map?level=5&score=${encodeURIComponent(score)}`;
+                    } catch (e) { /* ignore */ }
+                });
+            }
         }
 
     </script>
