@@ -4,15 +4,6 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../database/models');
 
 
-let saisie = "";
-        document.addEventListener('keydown', (e) => {
-            saisie += e.key.toLowerCase();
-            // Easter egg : si on tape "snake", on est redirigé
-            if (!"snake".startsWith(saisie)) saisie = e.key === 's' ? 's' : '';
-            if (saisie === "snake") window.location.href = "./jeux/snake.html";
-        });
-
-
 // Middleware pour vérifier le token JWT
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
