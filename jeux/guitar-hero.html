@@ -178,7 +178,6 @@
         </div>
         <p style="color: red; margin-bottom: 20px;">10 ERREURS MAX !</p>
         <button onclick="startGame()">JOUER ! 🤘</button>
-        <div id="music-status">Vérifiez que 'canard.mp3' est présent</div>
     </div>
 
     <div id="end-screen">
@@ -261,7 +260,7 @@
         });
 
         function accelerateGame() {
-            currentSpeedFactor += 0.3;
+            currentSpeedFactor += 0.01;
             music.playbackRate = currentSpeedFactor;
             music.currentTime = 0;
             music.play();
@@ -269,7 +268,7 @@
             noteSpeed = BASE_NOTE_SPEED * currentSpeedFactor;
 
             clearInterval(spawner);
-            let newInterval = (60000 / BPM) / currentSpeedFactor; 
+            let newInterval = (1000 / BPM) / currentSpeedFactor; 
             spawner = setInterval(spawnNote, newInterval);
 
             document.getElementById('speed-info').innerText = "VITESSE: " + Math.round(currentSpeedFactor * 100) + "%";
@@ -294,7 +293,7 @@
             
             gameLoop();
             
-            let interval = (60000 / BPM); 
+            let interval = (1000 / BPM); 
             spawner = setInterval(spawnNote, interval);
             
             // Headbang synchro
