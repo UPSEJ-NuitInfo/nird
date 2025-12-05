@@ -1,7 +1,9 @@
 # README
 
 ## 🌙 Nuit de l'Info 2025  
-Réalisé par l'équipe **UPSEJ** de l'**Université Savoie Mont-Blanc**
+Réalisé par l'équipe **UPSEJ** de l'**Université Savoie Mont-Blanc**  
+
+### 🎮 Nom du projet : **Canard vs GAFAM**
 
 ---
 
@@ -16,7 +18,7 @@ Projet hébergé chez Infomaniak : https://www.infomaniak.com/
 
 ## 🎮 Description du projet
 
-Notre projet est un site web composé de **plusieurs mini-jeux**, créés autour du thème national de la Nuit de l’Info.  
+Notre projet **Canard vs GAFAM** est un site web composé de **plusieurs mini-jeux**, créés autour du thème national de la Nuit de l’Info.  
 Votre mission : **battre les GAFAM** en explosant leurs scores et en dominant le leaderboard 💥
 
 ### Fonctionnalités principales :
