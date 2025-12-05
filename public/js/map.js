@@ -34,6 +34,12 @@ const levels = [
     description: 'Défendez Linux contre les horribles GAFAM !',
     icon: '🔫',
   },
+  {
+    id: 6,
+    name: 'Fin',
+    description: 'Fin de jeu',
+    icon: '🦆',
+  }
 ];
 
 // État du jeu
@@ -88,6 +94,7 @@ const levelPositions = [
   { x: 340, y: 420 },
   { x: 480, y: 300 },
   { x: 620, y: 380 },
+  { x: 760, y: 290 }
 ];
 
 // Mapping des jeux existants dans le dossier /jeux
@@ -97,6 +104,7 @@ const gameFiles = {
   3: '/jeux/guitar-hero.html', // Guitar Hero
   4: '/jeux/tape-taupe.html', // Taupe Taupe (Whack-a-GAFAM)
   5: '/jeux/laser-game.html', // Laser Game (Moodle Defender)
+  6: '/jeux/fin.html' //Fin
 };
 
 // ===== INITIALISATION =====
