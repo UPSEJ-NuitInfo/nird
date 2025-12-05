@@ -1,264 +1,320 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>VICTOIRE !</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-        body {
-            margin: 0;
-            background-color: #000;
-            color: white;
-            font-family: 'Press Start 2P', cursive;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+      body {
+        margin: 0;
+        background-color: #000;
+        color: white;
+        font-family: 'Press Start 2P', cursive;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      /* CADRE SCÈNE */
+      .scene {
+        position: relative;
+        width: 800px;
+        height: 450px;
+        background: linear-gradient(to bottom, #111 0%, #222 100%);
+        border: 4px solid #fff;
+        box-shadow: 0 0 50px rgba(0, 255, 0, 0.2);
+        overflow: hidden;
+      }
+
+      /* SOL */
+      .floor {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100px;
+        background: #333;
+        border-top: 4px solid #0f0;
+      }
+
+      /* SPRITES */
+      .sprite {
+        position: absolute;
+        bottom: 40px;
+        font-size: 80px;
+        filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5));
+        transition: transform 0.2s;
+        z-index: 10;
+      }
+
+      #hero {
+        left: -100px;
+        transform: scaleX(-1);
+      } /* Canard */
+
+      #villain {
+        right: 200px;
+        bottom: 60px;
+        font-size: 100px;
+        animation: float 2s infinite ease-in-out;
+      } /* GAFAM */
+
+      #princess {
+        right: 50px;
+        font-size: 60px;
+        filter: grayscale(1); /* Grise car prisonnière */
+      }
+
+      /* CAGE */
+      #cage {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        width: 80px;
+        height: 100px;
+        border: 4px solid cyan;
+        background: repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 10px,
+          cyan 10px,
+          cyan 12px
+        );
+        z-index: 20;
+      }
+
+      /* PARTICULES D'EXPLOSION */
+      .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        z-index: 15;
+      }
+
+      /* TEXTES DE FIN */
+      .end-text {
+        position: absolute;
+        top: 50px;
+        width: 100%;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 1s;
+        z-index: 100;
+      }
+
+      h1 {
+        color: #ffd700;
+        font-size: 40px;
+        margin-bottom: 20px;
+        text-shadow: 4px 4px 0 #000;
+      }
+      p {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #ccc;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 15px 30px;
+        font-family: inherit;
+        font-size: 16px;
+        background: #fff;
+        border: 4px solid #000;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #555;
+      }
+      button:hover {
+        background: #ffd700;
+        top: -2px;
+      }
+
+      /* ANIMATIONS */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
         }
-
-        /* CADRE SCÈNE */
-        .scene {
-            position: relative;
-            width: 800px;
-            height: 450px;
-            background: linear-gradient(to bottom, #111 0%, #222 100%);
-            border: 4px solid #fff;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.2);
-            overflow: hidden;
+        50% {
+          transform: translateY(-20px);
         }
-
-        /* SOL */
-        .floor {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 100px;
-            background: #333;
-            border-top: 4px solid #0f0;
+      }
+      .run {
+        animation: run-anim 0.2s infinite;
+      }
+      @keyframes run-anim {
+        0% {
+          bottom: 40px;
         }
-
-        /* SPRITES */
-        .sprite {
-            position: absolute;
-            bottom: 40px;
-            font-size: 80px;
-            filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.5));
-            transition: transform 0.2s;
-            z-index: 10;
+        50% {
+          bottom: 50px;
         }
-
-        #hero { left: -100px; transform: scaleX(-1); } /* Canard */
-        
-        #villain { 
-            right: 200px; 
-            bottom: 60px; 
-            font-size: 100px; 
-            animation: float 2s infinite ease-in-out;
-        } /* GAFAM */
-
-        #princess { 
-            right: 50px; 
-            font-size: 60px; 
-            filter: grayscale(1); /* Grise car prisonnière */
+        100% {
+          bottom: 40px;
         }
-
-        /* CAGE */
-        #cage {
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            width: 80px;
-            height: 100px;
-            border: 4px solid cyan;
-            background: repeating-linear-gradient(90deg, transparent, transparent 10px, cyan 10px, cyan 12px);
-            z-index: 20;
-        }
-
-        /* PARTICULES D'EXPLOSION */
-        .particle {
-            position: absolute;
-            width: 10px; height: 10px;
-            background-color: red;
-            z-index: 15;
-        }
-
-        /* TEXTES DE FIN */
-        .end-text {
-            position: absolute;
-            top: 50px;
-            width: 100%;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 1s;
-            z-index: 100;
-        }
-
-        h1 { color: #FFD700; font-size: 40px; margin-bottom: 20px; text-shadow: 4px 4px 0 #000; }
-        p { font-size: 14px; line-height: 1.5; color: #ccc; }
-
-        button {
-            margin-top: 20px;
-            padding: 15px 30px;
-            font-family: inherit;
-            font-size: 16px;
-            background: #fff;
-            border: 4px solid #000;
-            cursor: pointer;
-            box-shadow: 0 5px 0 #555;
-        }
-        button:hover { background: #FFD700; top: -2px; }
-
-        /* ANIMATIONS */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        .run { animation: run-anim 0.2s infinite; }
-        @keyframes run-anim { 0% { bottom: 40px; } 50% { bottom: 50px; } 100% { bottom: 40px; } }
-
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="scene">
-        
-        <div id="final-screen" class="end-text">
-            <h1>INTERNET LIBÉRÉ !</h1>
-            <p>Le méchant GAFAM a été détruit.</p>
-            <p style="color: #0f0; margin-top: 15px;">N'hésitez pas à rejouer<br>pour faire un meilleur score !</p>
-            <button onclick="location.href='/'">REJOUER ↻</button>
-        </div>
+      <div id="final-screen" class="end-text">
+        <h1>INTERNET LIBÉRÉ !</h1>
+        <p>Le méchant GAFAM a été détruit.</p>
+        <p style="color: #0f0; margin-top: 15px">
+          N'hésitez pas à rejouer<br />pour faire un meilleur score !
+        </p>
+        <button onclick="location.href='/'">REJOUER ↻</button>
+      </div>
 
-        <div class="floor"></div>
+      <div class="floor"></div>
 
-        <div id="hero" class="sprite">🦆</div>
-        <img id="villain" class="sprite" src="logo/microsoft.png" alt="Méchant GAFAM" style="width: 150px;">
-        
-        <div id="cage"></div>
-        <div id="princess" class="sprite">🐣</div>
+      <div id="hero" class="sprite">🦆</div>
+      <img
+        id="villain"
+        class="sprite"
+        src="logo/microsoft.png"
+        alt="Méchant GAFAM"
+        style="width: 150px"
+      />
 
+      <div id="cage"></div>
+      <div id="princess" class="sprite">🐣</div>
     </div>
 
     <script>
-        const hero = document.getElementById('hero');
-        const villain = document.getElementById('villain');
-        const cage = document.getElementById('cage');
-        const princess = document.getElementById('princess');
-        const finalScreen = document.getElementById('final-screen');
-        const scene = document.querySelector('.scene');
+      const hero = document.getElementById('hero');
+      const villain = document.getElementById('villain');
+      const cage = document.getElementById('cage');
+      const princess = document.getElementById('princess');
+      const finalScreen = document.getElementById('final-screen');
+      const scene = document.querySelector('.scene');
 
-        // Lancement auto
-        window.onload = () => { setTimeout(startCinematic, 500); };
+      // Lancement auto
+      window.onload = () => {
+        setTimeout(startCinematic, 500);
+      };
 
-        function startCinematic() {
-            // 1. Le héros entre
-            hero.classList.add('run');
-            let pos = -100;
-            
-            const timer = setInterval(() => {
-                pos += 8;
-                hero.style.left = pos + 'px';
+      function startCinematic() {
+        // 1. Le héros entre
+        hero.classList.add('run');
+        let pos = -100;
 
-                // Arrêt devant le méchant
-                if (pos >= 350) {
-                    clearInterval(timer);
-                    hero.classList.remove('run');
-                    setTimeout(attack, 500);
-                }
-            }, 20);
+        const timer = setInterval(() => {
+          pos += 8;
+          hero.style.left = pos + 'px';
+
+          // Arrêt devant le méchant
+          if (pos >= 350) {
+            clearInterval(timer);
+            hero.classList.remove('run');
+            setTimeout(attack, 500);
+          }
+        }, 20);
+      }
+
+      function attack() {
+        // 2. Attaque (Saut)
+        hero.style.bottom = '150px';
+        hero.style.transform = 'scaleX(-1) rotate(-20deg)';
+
+        setTimeout(() => {
+          // Impact
+          hero.style.bottom = '40px';
+          hero.style.transform = 'scaleX(-1) rotate(0deg)';
+
+          // 3. EXPLOSION DU MÉCHANT
+          explodeVillain();
+        }, 300);
+      }
+
+      function explodeVillain() {
+        // On cache le méchant
+        villain.style.visibility = 'hidden';
+
+        // On crée 50 particules
+        for (let i = 0; i < 50; i++) {
+          const p = document.createElement('div');
+          p.classList.add('particle');
+
+          // Position de départ (centre du méchant)
+          // Le méchant est à right:200px, bottom:60px.
+          // On convertit approximativement en pixels depuis la gauche
+          const startX = 550;
+          const startY = 300; // Position Y inversée pour le top
+
+          p.style.left = startX + 'px';
+          p.style.top = startY + 'px';
+
+          // Couleur aléatoire (Glitch)
+          const colors = ['red', 'purple', 'black', 'white'];
+          p.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+
+          scene.appendChild(p);
+
+          // Mouvement aléatoire
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 200 + 50;
+
+          // Animation JS Web Animations API
+          p.animate(
+            [
+              { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+              {
+                transform: `translate(${Math.cos(angle) * speed}px, ${
+                  Math.sin(angle) * speed
+                }px) scale(0)`,
+                opacity: 0,
+              },
+            ],
+            {
+              duration: 800,
+              easing: 'ease-out',
+            },
+          );
+
+          // Nettoyage
+          setTimeout(() => p.remove(), 800);
         }
 
-        function attack() {
-            // 2. Attaque (Saut)
-            hero.style.bottom = "150px";
-            hero.style.transform = "scaleX(-1) rotate(-20deg)";
-            
+        // Suite de l'histoire
+        setTimeout(freePrincess, 1000);
+      }
+
+      function freePrincess() {
+        // La cage disparait
+        cage.style.display = 'none';
+        // La princesse retrouve ses couleurs
+        princess.style.filter = 'grayscale(0)';
+        princess.innerText = '❤️'; // Elle envoie un coeur
+
+        setTimeout(() => {
+          princess.innerText = '🐣';
+          showEndScreen();
+        }, 1000);
+      }
+
+      function showEndScreen() {
+        finalScreen.style.opacity = 1;
+        try {
+          // If the user hasn't already seen the final cinematic, mark it and return to the map
+          if (!localStorage.getItem('nird_fin_seen')) {
+            localStorage.setItem('nird_fin_seen', '1');
+            // Give the player a few seconds to enjoy the screen before redirecting back
             setTimeout(() => {
-                // Impact
-                hero.style.bottom = "40px";
-                hero.style.transform = "scaleX(-1) rotate(0deg)";
-                
-                // 3. EXPLOSION DU MÉCHANT
-                explodeVillain();
-                
-            }, 300);
+              // Redirect back to the map and send a high score so the map marks the level as completed
+              window.location.href =
+                '/map?level=6&score=' + encodeURIComponent(9999);
+            }, 3000);
+          }
+        } catch (e) {
+          console.error('Erreur lors du traitement de la fin :', e);
         }
-
-        function explodeVillain() {
-            // On cache le méchant
-            villain.style.visibility = "hidden";
-
-            // On crée 50 particules
-            for(let i=0; i<50; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                
-                // Position de départ (centre du méchant)
-                // Le méchant est à right:200px, bottom:60px.
-                // On convertit approximativement en pixels depuis la gauche
-                const startX = 550; 
-                const startY = 300; // Position Y inversée pour le top
-
-                p.style.left = startX + "px";
-                p.style.top = startY + "px";
-                
-                // Couleur aléatoire (Glitch)
-                const colors = ['red', 'purple', 'black', 'white'];
-                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-                scene.appendChild(p);
-
-                // Mouvement aléatoire
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 200 + 50;
-                
-                // Animation JS Web Animations API
-                p.animate([
-                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${Math.cos(angle)*speed}px, ${Math.sin(angle)*speed}px) scale(0)`, opacity: 0 }
-                ], {
-                    duration: 800,
-                    easing: 'ease-out'
-                });
-
-                // Nettoyage
-                setTimeout(() => p.remove(), 800);
-            }
-
-            // Suite de l'histoire
-            setTimeout(freePrincess, 1000);
-        }
-
-        function freePrincess() {
-            // La cage disparait
-            cage.style.display = 'none';
-            // La princesse retrouve ses couleurs
-            princess.style.filter = "grayscale(0)";
-            princess.innerText = "❤️"; // Elle envoie un coeur
-            
-            setTimeout(() => {
-                princess.innerText = "🐣";
-                showEndScreen();
-            }, 1000);
-        }
-
-        function showEndScreen() {
-            finalScreen.style.opacity = 1;
-            try {
-                // If the user hasn't already seen the final cinematic, mark it and return to the map
-                if (!localStorage.getItem('nird_fin_seen')) {
-                    localStorage.setItem('nird_fin_seen', '1');
-                    // Give the player a few seconds to enjoy the screen before redirecting back
-                    setTimeout(() => {
-                        // Redirect back to the map and send a high score so the map marks the level as completed
-                        window.location.href = '/map?level=5&score=' + encodeURIComponent(9999);
-                    }, 3000);
-                }
-            } catch (e) {
-                console.error('Erreur lors du traitement de la fin :', e);
-            }
-        }
-
+      }
     </script>
-</body>
+  </body>
 </html>
