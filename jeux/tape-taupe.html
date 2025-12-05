@@ -24,13 +24,14 @@
   }
 
   .game {
-  position: relative;
+    position: relative;
     width:900px;
     max-width:95vw;
     background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border-radius:14px;
     box-shadow:0 10px 30px rgba(2,6,23,0.6);
     padding:18px;
+    overflow: hidden; /* Pour que l'overlay reste dans les bords arrondis */
   }
 
   .header{
@@ -58,7 +59,7 @@
     border-radius:10px;
     overflow:hidden;
     user-select:none;
-    cursor: none; /* on masque le curseur normal, on affiche notre marteau */
+    cursor: none; 
   }
 
   /* positions possibles (grid-like) */
@@ -71,7 +72,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    pointer-events:none; /* click handled by target */
+    pointer-events:none; 
   }
 
   .target {
@@ -90,7 +91,6 @@
     border:2px solid rgba(255,255,255,0.03);
     box-shadow:0 6px 18px rgba(2,6,23,0.5), inset 0 -6px 18px rgba(0,0,0,0.4);
     
-    /* MODIFICATION ICI : Suppression du cursor url orange et suppression du highlight mobile */
     cursor: none; 
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -107,7 +107,6 @@
     width:100px;
     height:100px;
     pointer-events:none;
-    /* Point d'origine au centre de la tête du marteau */
     transform-origin: 50% 25%;
     transition:transform 80ms linear;
     z-index:9999;
@@ -118,43 +117,90 @@
     height:100%;
     display:block;
   }
-  /* Animation d'écrasement (scale) au lieu de rotation */
   .hammer.hit{ transform: scale(0.85); transition:transform 80ms ease-out; }
 
-.legend {
-  position: absolute;
-  right: -140px;
-  top: 20px;
-  background: rgba(255,255,255,0.06);
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 22px;
-  width: 120px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  backdrop-filter: blur(4px);
-}
+  /* --- NOUVEAU : Écran de Game Over --- */
+  .game-over-screen {
+    position: absolute;
+    inset: 0; /* Prend toute la place du conteneur .game */
+    background: rgba(11, 18, 32, 0.85); /* Fond sombre semi-transparent */
+    backdrop-filter: blur(8px); /* Effet de flou moderne */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
 
-.legend-title {
-  font-weight: 700;
-  margin-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding-bottom: 4px;
-}
+  .game-over-screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    cursor: default; /* On rend le curseur normal ici pour cliquer sur le bouton */
+  }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+  .game-over-content {
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .game-over-screen.active .game-over-content {
+    transform: translateY(0);
+  }
 
-.legend-item .icon {
-  font-size: 20px;
-  width: 24px;
-  text-align: center;
-}
+  .game-over-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-  /* small screens */
+  .final-score-box {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--accent);
+    margin: 12px 0 24px 0;
+    text-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  .restart-btn {
+    background: var(--accent);
+    color: #0f1724;
+    border: none;
+    padding: 12px 32px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .restart-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+  }
+
+  .legend {
+    position: absolute;
+    right: -140px;
+    top: 20px;
+    background: rgba(255,255,255,0.06);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 22px;
+    width: 120px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+  }
+  .legend-title { font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-item .icon { font-size: 20px; width: 24px; text-align: center; }
+
   @media (max-width:640px){
     .arena{height:420px;}
     .target{width:70px;height:70px;font-size:30px;}
@@ -182,14 +228,24 @@
 </head>
 <body>
   <div class="game">
-      <div class="legend">
-    <div class="legend-title">GAFAM :</div>
-    <div class="legend-item"><span class="icon">🌐</span> Google (1 clic)</div>
-    <div class="legend-item"><span class="icon">🍎</span> Apple (2 clics)</div>
-    <div class="legend-item"><span class="icon">Ⓜ️</span> Meta (3 clics)</div>
-    <div class="legend-item"><span class="icon">📦</span> Amazon (4 clics)</div>
-    <div class="legend-item"><span class="icon">💻</span> Microsoft (5 clics)</div>
+      <div class="game-over-screen" id="gameOverScreen">
+        <div class="game-over-content">
+          <div class="game-over-title">Partie Terminée !</div>
+          <div style="opacity:0.8">Votre score final</div>
+          <div class="final-score-box" id="finalScoreDisplay">0</div>
+          <button class="restart-btn" id="restartOverlayBtn">Rejouer</button>
+        </div>
       </div>
+
+      <div class="legend">
+        <div class="legend-title">GAFAM :</div>
+        <div class="legend-item"><span class="icon">🌐</span> Google (1 clic)</div>
+        <div class="legend-item"><span class="icon">🍎</span> Apple (2 clics)</div>
+        <div class="legend-item"><span class="icon">Ⓜ️</span> Meta (3 clics)</div>
+        <div class="legend-item"><span class="icon">📦</span> Amazon (4 clics)</div>
+        <div class="legend-item"><span class="icon">💻</span> Microsoft (5 clics)</div>
+      </div>
+
       <div class="header">
       <div>
         <h2 style="margin:0 0 6px 0">Whack-a-GAFAM</h2>
@@ -226,13 +282,10 @@
   <g>
     <rect x='18' y='10' width='28' height='12' rx='2' fill='%23d1d5db'/>
     <rect x='18' y='22' width='28' height='6' rx='2' fill='%23a1a1aa'/>
-    
     <rect x='30' y='28' width='6' height='30' rx='3' fill='%232c3e50'/>
-
     <rect x='26' y='52' width='14' height='8' rx='3' fill='%231f2937'/>
   </g>
 </svg>" alt="marteau">
-
   </div>
 
 <script>
@@ -245,6 +298,11 @@
   const timeEl = document.getElementById('time');
   const hammer = document.getElementById('hammer');
   const diffSelect = document.getElementById('difficulty');
+  
+  // Elements Game Over
+  const gameOverScreen = document.getElementById('gameOverScreen');
+  const finalScoreDisplay = document.getElementById('finalScoreDisplay');
+  const restartOverlayBtn = document.getElementById('restartOverlayBtn');
 
   let score = 0;
   let lives = 5;
@@ -256,39 +314,28 @@
   let activeTargets = new Set();
 
   function getRandomGAFAM() {
-  const allTypes = [
-    { icon: "🌐", hp: 1, name: "Google" },
-    { icon: "🍎", hp: 2, name: "Apple" },
-    { icon: "Ⓜ️", hp: 3, name: "Meta" },
-    { icon: "📦", hp: 4, name: "Amazon" },
-    { icon: "💻", hp: 5, name: "Microsoft" }
-  ];
+    const allTypes = [
+      { icon: "🌐", hp: 1, name: "Google" },
+      { icon: "🍎", hp: 2, name: "Apple" },
+      { icon: "Ⓜ️", hp: 3, name: "Meta" },
+      { icon: "📦", hp: 4, name: "Amazon" },
+      { icon: "💻", hp: 5, name: "Microsoft" }
+    ];
+    const difficulty = diffSelect.value;
+    let typesToUse;
+    if (difficulty === 'easy') typesToUse = allTypes.slice(0, 2);
+    else if (difficulty === 'normal') typesToUse = allTypes.slice(0, 4);
+    else typesToUse = allTypes;
 
-  const difficulty = diffSelect.value;
-  let typesToUse;
-
-  if (difficulty === 'easy') {
-    // Facile: Google (1 HP) et Apple (2 HP)
-    typesToUse = allTypes.slice(0, 2);
-  } else if (difficulty === 'normal') {
-    // Normal: Google (1 HP) à Amazon (4 HP)
-    typesToUse = allTypes.slice(0, 4);
-  } else {
-    // Difficile: Toutes les icônes
-    typesToUse = allTypes;
+    return typesToUse[Math.floor(Math.random() * typesToUse.length)];
   }
 
-  // Choix aléatoire parmi le sous-ensemble sélectionné
-  return typesToUse[Math.floor(Math.random() * typesToUse.length)];
-}
-
-  // Generate grid positions (holes)
   function createHoles() {
     holes = [];
     const cols = 6;
     const rows = 3;
-    const padX = 14; // percent
-    const padY = 12; // percent
+    const padX = 14; 
+    const padY = 12; 
     for (let r=0;r<rows;r++){
       for (let c=0;c<cols;c++){
         const x = padX + (c/(cols-1))*(100 - padX*2);
@@ -296,7 +343,6 @@
         holes.push({x,y});
       }
     }
-    // create hole elements (transparent anchors)
     arena.innerHTML = '';
     holes.forEach((pos,i) => {
       const div = document.createElement('div');
@@ -308,72 +354,62 @@
     });
   }
 
-function spawnTarget() {
-  const free = holes.map((h,i)=>i).filter(i => !activeTargets.has(i));
-  if (free.length === 0) return;
+  function spawnTarget() {
+    const free = holes.map((h,i)=>i).filter(i => !activeTargets.has(i));
+    if (free.length === 0) return;
 
-  const idx = free[Math.floor(Math.random() * free.length)];
-  activeTargets.add(idx);
+    const idx = free[Math.floor(Math.random() * free.length)];
+    activeTargets.add(idx);
 
-  const holeEl = arena.querySelector('.hole[data-idx="'+idx+'"]');
-  const target = document.createElement('div');
-  target.className = 'target';
+    const holeEl = arena.querySelector('.hole[data-idx="'+idx+'"]');
+    const target = document.createElement('div');
+    target.className = 'target';
 
-  // Choisir type de GAFAM en fonction de la difficulté
-  const comp = getRandomGAFAM();
-  target.dataset.hp = comp.hp;
-  target.innerHTML = `<span class="icon">${comp.icon}</span>`;
+    const comp = getRandomGAFAM();
+    target.dataset.hp = comp.hp;
+    target.innerHTML = `<span class="icon">${comp.icon}</span>`;
+    target.dataset.hole = idx;
 
-  target.dataset.hole = idx;
+    const hit = () => {
+      let hp = parseInt(target.dataset.hp);
+      hp--;
+      target.style.transform = "translateY(0) scale(0.9)";
+      setTimeout(() => { target.style.transform = ""; }, 160);
 
-  // Click handler
-  const hit = () => {
-    let hp = parseInt(target.dataset.hp);
-    hp--;
+      if (hp > 0) {
+        target.dataset.hp = hp;
+        return; 
+      }
+      score += comp.hp; 
+      scoreEl.textContent = score;
+      smashAnimationAt(target);
+      removeTarget(target, true);
+    };
 
-    // petite animation de dégâts
-    target.style.transform = "translateY(0) scale(0.9)";
-    setTimeout(() => { target.style.transform = ""; }, 160);
+    target.addEventListener('click', hit);
+    holeEl.appendChild(target);
 
-    if (hp > 0) {
-      target.dataset.hp = hp;
-      return; // pas détruit encore
-    }
+    requestAnimationFrame(() => target.classList.add('show'));
 
-    score += comp.hp; // donner + de points selon HP original
-    scoreEl.textContent = score;
+    const difficulty = diffSelect.value;
+    const visibleMs = difficulty === 'easy' ? 1800 :
+                      difficulty === 'hard' ? 1200 : 1500;
 
-    smashAnimationAt(target);
-    removeTarget(target, true);
-  };
+    const timeout = setTimeout(() => {
+      if (document.body.contains(target) && target.classList.contains('show')) {
+        removeTarget(target, false);
+        loseLife();
+      }
+    }, visibleMs + Math.random() * 400);
 
-  target.addEventListener('click', hit);
-  holeEl.appendChild(target);
-
-  requestAnimationFrame(() => target.classList.add('show'));
-
-  // Durée d'apparition
-  const difficulty = diffSelect.value;
-  const visibleMs = difficulty === 'easy' ? 1800 :
-                    difficulty === 'hard' ? 1200 : 1500;
-
-  const timeout = setTimeout(() => {
-    if (document.body.contains(target) && target.classList.contains('show')) {
-      removeTarget(target, false);
-      loseLife();
-    }
-  }, visibleMs + Math.random() * 400);
-
-  target._timeout = timeout;
-}
-
+    target._timeout = timeout;
+  }
 
   function removeTarget(target, wasHit){
     const idx = Number(target.dataset.hole);
     activeTargets.delete(idx);
     target.classList.remove('show');
     clearTimeout(target._timeout);
-    // small fade then remove
     setTimeout(()=> {
       if (target.parentNode) target.parentNode.removeChild(target);
     }, 220);
@@ -386,21 +422,17 @@ function spawnTarget() {
   }
 
   function smashAnimationAt(el){
-    // brief scale/shake
     el.style.transform = 'translateY(0) scale(0.92)';
     setTimeout(()=>{ el.style.transform = ''; }, 160);
-    // hammer hit effect
     hammer.classList.add('hit');
     setTimeout(()=> hammer.classList.remove('hit'), 140);
   }
 
-  // spawn loop according to difficulty
   function startSpawning() {
     clearInterval(spawnInterval);
     const difficulty = diffSelect.value;
     const rate = difficulty === 'easy' ? 850 : difficulty === 'hard' ? 430 : 650;
     spawnInterval = setInterval(spawnTarget, rate);
-    // initial burst
     for (let i=0;i<3;i++) setTimeout(spawnTarget, i*200);
   }
 
@@ -417,6 +449,10 @@ function spawnTarget() {
 
   function startGame(){
     if (running) return;
+    
+    // Cacher l'écran Game Over s'il est affiché
+    gameOverScreen.classList.remove('active');
+
     running = true;
     score = 0; lives = 5; timeLeft = 60;
     scoreEl.textContent = score;
@@ -433,22 +469,21 @@ function spawnTarget() {
     clearInterval(spawnInterval);
     clearInterval(timerInterval);
     activeTargets.clear();
-    // remove targets
+    
+    // Nettoyer le plateau
     const targets = arena.querySelectorAll('.target');
     targets.forEach(t => t.parentNode.removeChild(t));
-    setTimeout(()=> {
-      alert('Fin du jeu ! Score: ' + score);
-    }, 80);
+
+    // Afficher l'écran Game Over (au lieu de l'alerte)
+    finalScoreDisplay.textContent = score;
+    gameOverScreen.classList.add('active');
   }
 
-  // hammer position tracking
   window.addEventListener('mousemove', (e)=>{
-    // Ajustement pour centrer la tête du marteau
     hammer.style.left = (e.clientX - 50) + 'px';
     hammer.style.top = (e.clientY - 25) + 'px';
   });
 
-  // allow touch: map touch to hammer and clicks
   window.addEventListener('touchmove', (e) => {
     const t = e.touches[0];
     if (t) {
@@ -457,17 +492,15 @@ function spawnTarget() {
     }
   }, {passive:true});
 
-  // simulate hammer down when clicking anywhere
   window.addEventListener('mousedown', ()=> hammer.classList.add('hit'));
   window.addEventListener('mouseup', ()=> hammer.classList.remove('hit'));
   window.addEventListener('touchstart', ()=> hammer.classList.add('hit'));
   window.addEventListener('touchend', ()=> hammer.classList.remove('hit'));
 
-  // start/stop
   startBtn.addEventListener('click', startGame);
   stopBtn.addEventListener('click', endGame);
+  restartOverlayBtn.addEventListener('click', startGame); // Bouton de l'overlay
 
-  // keyboard: space to smash nearest target under cursor
   window.addEventListener('keydown',(e)=>{
     if (e.code==='Space') {
       const el = document.elementFromPoint(parseInt(hammer.style.left||0)+50, parseInt(hammer.style.top||0)+25);
@@ -478,9 +511,7 @@ function spawnTarget() {
     }
   });
 
-  // init
   createHoles();
-
 })();
 </script>
 </body>
