@@ -8,12 +8,12 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* Pour empiler le titre et le jeu */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #87CEEB; /* Ciel Bleu */
-            font-family: Verdana, sans-serif; /* Police système standard */
+            font-family: Verdana, sans-serif;
             overflow: hidden;
             user-select: none;
         }
@@ -50,7 +50,7 @@
             z-index: 2;
         }
 
-        /* Animation de marche (dandinement) */
+        /* Animation de marche */
         .marche {
             animation: dandinement 0.3s infinite alternate;
         }
@@ -60,7 +60,7 @@
             to { transform: rotate(10deg); }
         }
 
-        /* Animation de saut (rotation) */
+        /* Animation de saut */
         .saut-anim {
             animation: rotationSaut 0.5s;
         }
@@ -70,14 +70,12 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Obstacles GAFAM */
+        /* Obstacles GAFAM (Images) */
         .obstacle {
             position: absolute;
             bottom: 0;
-            font-size: 30px; 
-            font-weight: bold;
             z-index: 1;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            object-fit: contain; /* Garde les proportions du logo */
         }
 
         /* Nuages déco */
@@ -170,9 +168,14 @@
         let obstacles = [];
         let vitesse = 8;
         
-        // Liste des ennemis GAFAM
-        const GAFAM = ["G", "🍎", "📘", "📦", "🪟"];
-        const COULEURS_GAFAM = ["#4285F4", "#555555", "#1877F2", "#FF9900", "#00A4EF"];
+        // Liste des images GAFAM
+        const GAFAM = [
+            "logo/google.webp",
+            "logo/apple.png",
+            "logo/facebook.webp",
+            "logo/Amazon.png",
+            "logo/microsoft.png"
+        ];
 
         document.addEventListener('keydown', (e) => {
             if ((e.code === "Space" || e.code === "ArrowUp") && !jeuFini) sauter();
@@ -216,12 +219,17 @@
         function creerObstacle() {
             if (jeuFini) return;
 
-            const obstacle = document.createElement('div');
+            // Création d'une image pour l'obstacle
+            const obstacle = document.createElement('img');
             obstacle.classList.add('obstacle');
             
-            const index = Math.floor(Math.random() * GAFAM.length);
-            obstacle.innerText = GAFAM[index];
-            obstacle.style.color = COULEURS_GAFAM[index];
+            // Choix aléatoire d'une image
+            const imageSrc = GAFAM[Math.floor(Math.random() * GAFAM.length)];
+            obstacle.src = imageSrc;
+
+            // Taille fixe pour les logos
+            obstacle.style.width = "50px";
+            obstacle.style.height = "50px";
             
             obstacle.style.left = '800px';
             container.appendChild(obstacle);
@@ -248,9 +256,10 @@
                 let canardRect = canard.getBoundingClientRect();
                 let obstacleRect = obstacle.getBoundingClientRect();
 
+                // Hitbox ajustée
                 if (
-                    canardRect.right > obstacleRect.left + 15 &&
-                    canardRect.left < obstacleRect.right - 15 &&
+                    canardRect.right > obstacleRect.left + 10 &&
+                    canardRect.left < obstacleRect.right - 10 &&
                     canardRect.bottom > obstacleRect.top + 10
                 ) {
                     finDuJeu(); 
@@ -292,7 +301,17 @@
             } catch (e) { }
         }
 
+        // Démarrage
         creerObstacle();
+
+        // Easter Egg
+        let saisie = "";
+        document.addEventListener('keydown', (e) => {
+            saisie += e.key.toLowerCase();
+            if (!"bouton".startsWith(saisie)) saisie = e.key === 'b' ? 'b' : '';
+            if (saisie === "bouton") window.location.href = "boutonCss.html";
+        });
+
     </script>
 </body>
 </html>
