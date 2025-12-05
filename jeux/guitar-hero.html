@@ -476,6 +476,13 @@
             if (saisie === "snake") window.location.href = "snake.html";
         });
 
+        document.addEventListener('keydown', (e) => {
+            saisie += e.key.toLowerCase();
+            // Easter egg : si on tape "bouton", on est redirigé
+            if (!"bouton".startsWith(saisie)) saisie = e.key === 'b' ? 'b' : '';
+            if (saisie === "bouton") window.location.href = "boutonCssFou.html";
+        });
+
     </script>
 </body>
 </html>
