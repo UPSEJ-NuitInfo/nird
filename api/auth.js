@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { User } = require('../database/models');
 
+
 // Middleware pour vérifier le token JWT
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
