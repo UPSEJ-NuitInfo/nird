@@ -49,6 +49,38 @@ let pendingLevelScore = 0; // score achieved on last completed level
 let pendingLevelId = null; // level id just completed
 let levelThresholds = {}; // loaded from public/data/level_thresholds.json
 
+// Toast helper: shows non-blocking popups top-right
+function ensureToastContainer() {
+  let c = document.getElementById('toastContainer');
+  if (!c) {
+    c = document.createElement('div');
+    c.id = 'toastContainer';
+    c.className = 'toast-container';
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+function showToast(message, type = 'info', timeout = 3600) {
+  try {
+    const container = ensureToastContainer();
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerText = message;
+    container.appendChild(t);
+    // Auto-remove
+    setTimeout(() => {
+      t.style.transition = 'opacity 0.25s, transform 0.25s';
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(-6px)';
+      setTimeout(() => t.remove(), 260);
+    }, timeout);
+    return t;
+  } catch (e) {
+    console.log('Toast error', e);
+  }
+}
+
 // Positions des niveaux (adaptées à la map) — 5 niveaux
 const levelPositions = [
   { x: 60, y: 460 },
@@ -106,7 +138,7 @@ function saveGameState() {
 
 // ===== INITIALISER LA CARTE =====
 function initMap() {
-  const mapContainer = document.getElementById('mapContainer');
+  const mapContainer = document.getElementById('mapStage') || document.getElementById('mapContainer');
   mapContainer.innerHTML = '';
 
   // Dessiner les chemins de connexion
@@ -182,7 +214,7 @@ function selectLevel(levelId) {
     levelId > gameState.currentLevel &&
     !gameState.completedLevels.includes(levelId - 1)
   ) {
-    alert("🔒 Vous devez d'abord compléter le niveau précédent!");
+    showToast("🔒 Vous devez d'abord compléter le niveau précédent!", 'warning');
     return;
   }
 
@@ -219,16 +251,12 @@ function playLevel() {
     try {
       window.location.href = gameFile;
     } catch (e) {
-      alert(
-        `🎮 Niveau ${levelId}: ${level.name}\n\n(Le jeu s'ouvrira dans un nouvel onglet)`,
-      );
+      showToast(`🎮 Niveau ${levelId}: ${level.name}\n\n(Le jeu s'ouvrira dans un nouvel onglet)`, 'info');
     }
     // The game page will redirect back to /map?level=<id>&score=<score>
     return;
   } else {
-    alert(
-      `🎮 Niveau ${levelId}: ${level.name}\n\nLe contenu du jeu sera intégré ici...`,
-    );
+    showToast(`🎮 Niveau ${levelId}: ${level.name}\n\nLe contenu du jeu sera intégré ici...`, 'info');
   }
 
   // Compléter le niveau
@@ -265,21 +293,17 @@ function playLevel() {
         await saveScoreForUser(pendingLevelId, pendingLevelScore);
         showLeaderboard(pendingLevelId);
         if (unlocked)
-          alert(
-            `✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${pendingLevelScore})`,
-          );
+          showToast(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${pendingLevelScore})`, 'info');
         else
-          alert(
-            `⚠️ Score enregistré (${pendingLevelScore}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
-          );
+          showToast(`⚠️ Score enregistré (${pendingLevelScore}). Score minimum pour débloquer le niveau suivant: ${threshold}`, 'warning');
       } else {
         // otherwise prompt to login
-        alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
-        window.location.href = '/index.html';
+        showToast("⚠️ Vous devez être connecté pour sauvegarder vos scores.", 'warning');
+        setTimeout(() => (window.location.href = '/index.html'), 350);
       }
     }, 600);
   } else {
-    alert('✓ Ce niveau est déjà complété!');
+    showToast('✓ Ce niveau est déjà complété!', 'info');
   }
 }
 
@@ -295,13 +319,19 @@ function resetProgress() {
     saveGameState();
     initMap();
     updateLevelInfo();
-    alert('✨ Progression réinitialisée!');
+    showToast('✨ Progression réinitialisée!', 'info');
   }
 }
 
 // ===== LEADERBOARD =====
 function closeLeaderboardModal() {
-  document.getElementById('leaderboardModal').classList.add('hidden');
+  const lb = document.getElementById('leaderboardModal');
+  if (lb) {
+    lb.classList.add('hidden');
+    lb.style.zIndex = '';
+  }
+  const profile = document.getElementById('profileModal');
+  if (profile) profile.style.zIndex = '11100';
 }
 
 async function showLeaderboard(levelId = null) {
@@ -427,79 +457,26 @@ function loadCurrentUser() {
 
 // Profile UI helpers
 function renderProfileArea() {
-  const panel = document.getElementById('userPanel');
-  if (!panel) return;
-  panel.innerHTML = '';
+  // Render profile as a single button in the top-right `#profileArea`.
+  const topArea = document.getElementById('profileArea');
+  const fixedPanel = document.getElementById('userPanel');
+  if (fixedPanel) fixedPanel.classList.add('hidden');
+  if (!topArea) return;
+  topArea.innerHTML = '';
 
   if (currentUser) {
-    // Header with user info
-    const header = document.createElement('div');
-    header.className = 'user-panel-header';
-    header.innerHTML = `👤 ${currentUser.username}`;
-    panel.appendChild(header);
-
-    // User details
-    const content = document.createElement('div');
-    content.className = 'user-panel-content';
-    content.innerHTML = `
-            <p><strong>Utilisateur ID:</strong> ${currentUser.id}</p>
-        `;
-    panel.appendChild(content);
-
-    // Action buttons
-    const actions = document.createElement('div');
-    actions.className = 'user-panel-actions';
-
-    const viewProfileBtn = document.createElement('button');
-    viewProfileBtn.className = 'btn-panel-primary';
-    viewProfileBtn.textContent = '📊 Voir profil détaillé';
-    viewProfileBtn.addEventListener('click', () => openProfileModal());
-
-    const myScoresBtn = document.createElement('button');
-    myScoresBtn.className = 'btn-panel-secondary';
-    myScoresBtn.textContent = '🏆 Mes meilleurs scores';
-    myScoresBtn.addEventListener('click', () => showMyAllScores());
-
-    const logoutBtn = document.createElement('button');
-    logoutBtn.className = 'btn-panel-danger';
-    logoutBtn.textContent = '🚪 Se déconnecter';
-    logoutBtn.addEventListener('click', () => logout());
-
-    const resetBtn = document.createElement('button');
-    resetBtn.className = 'btn-panel-secondary';
-    resetBtn.textContent = '⚠️ Reset données';
-    resetBtn.addEventListener('click', () => clearAppStorage());
-
-    actions.appendChild(viewProfileBtn);
-    actions.appendChild(myScoresBtn);
-    actions.appendChild(logoutBtn);
-    actions.appendChild(resetBtn);
-
-    panel.appendChild(actions);
-    panel.classList.remove('hidden');
+    const btn = document.createElement('button');
+    btn.className = 'profile-btn';
+    const avatar = (currentUser.username || 'U').charAt(0).toUpperCase();
+    btn.innerHTML = `<span class="profile-avatar">${avatar}</span><span class="profile-name">${currentUser.username}</span>`;
+    btn.addEventListener('click', () => openProfileModal());
+    topArea.appendChild(btn);
   } else {
-    // Not logged in
-    const header = document.createElement('div');
-    header.className = 'user-panel-header';
-    header.innerHTML = '🎮 Pas connecté';
-    panel.appendChild(header);
-
-    const content = document.createElement('div');
-    content.className = 'user-panel-content';
-    content.innerHTML = '<p>Connectez-vous pour enregistrer vos scores !</p>';
-    panel.appendChild(content);
-
     const loginBtn = document.createElement('button');
-    loginBtn.className = 'btn-panel-primary';
-    loginBtn.textContent = '✓ Se connecter';
-    loginBtn.addEventListener('click', () => { window.location.href = '/index.html'; });
-
-    const actions = document.createElement('div');
-    actions.className = 'user-panel-actions';
-    actions.appendChild(loginBtn);
-
-    panel.appendChild(actions);
-    panel.classList.remove('hidden');
+    loginBtn.className = 'profile-btn';
+    loginBtn.innerHTML = `<span class="profile-avatar">👤</span><span class="profile-name">Se connecter</span>`;
+    loginBtn.addEventListener('click', () => (window.location.href = '/index.html'));
+    topArea.appendChild(loginBtn);
   }
 }
 
@@ -507,14 +484,30 @@ function openProfileModal() {
   const modal = document.getElementById('profileModal');
   const content = document.getElementById('profileContent');
   if (!modal || !content) return;
+  const actions = modal.querySelector('.modal-actions');
   if (!currentUser) {
     content.innerHTML = '<div>Aucun utilisateur connecté.</div>';
+    if (actions) {
+      actions.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeProfileModalClean()">Fermer</button>
+        <button class="btn btn-primary" onclick="window.location.href='/index.html'">Se connecter</button>
+      `;
+    }
   } else {
     content.innerHTML = `
             <p><strong>Pseudo:</strong> ${currentUser.username}</p>
-            <p><strong>ID:</strong> ${currentUser.id}</p>
         `;
+    if (actions) {
+      actions.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeProfileModalClean()">Fermer</button>
+        <button class="btn btn-primary" onclick="showMyAllScores()">Mes meilleurs scores</button>
+        <button class="btn btn-danger" onclick="logout()">Se déconnecter</button>
+      `;
+    }
   }
+  // enlarge profile modal for readability
+  const modalContent = modal.querySelector('.modal-content');
+  if (modalContent) modalContent.classList.add('modal-large');
   modal.classList.remove('hidden');
 }
 
@@ -523,10 +516,19 @@ function closeProfileModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+// Ensure we remove any modal-large class when closing profile modal
+function closeProfileModalClean() {
+  const modal = document.getElementById('profileModal');
+  if (!modal) return;
+  const modalContent = modal.querySelector('.modal-content');
+  if (modalContent) modalContent.classList.remove('modal-large');
+  modal.classList.add('hidden');
+}
+
 // Show all scores for current user across all levels
 async function showMyAllScores() {
   if (!currentUser) {
-    alert("Connectez-vous d'abord");
+    showToast("Connectez-vous d'abord", 'warning');
     return;
   }
 
@@ -580,15 +582,22 @@ async function showMyAllScores() {
   }
 
   content.innerHTML = html;
-  document.getElementById('leaderboardModal').classList.remove('hidden');
+  const lbModal = document.getElementById('leaderboardModal');
+  const profileModalEl = document.getElementById('profileModal');
+  // ensure leaderboard appears above profile modal
+  if (profileModalEl) profileModalEl.style.zIndex = '11100';
+  if (lbModal) {
+    lbModal.style.zIndex = '11200';
+    lbModal.classList.remove('hidden');
+  }
 }
 
 function logout() {
   localStorage.removeItem('token');
   currentUser = null;
   renderProfileArea();
-  alert('Déconnecté.');
-  window.location.href = '/index.html';
+  showToast('Déconnecté.', 'info');
+  setTimeout(() => (window.location.href = '/index.html'), 350);
 }
 
 function clearAppStorage() {
@@ -604,8 +613,8 @@ function clearAppStorage() {
     const k = localStorage.key(i);
     if (k && k.startsWith('leaderboardData_level_')) localStorage.removeItem(k);
   }
-  alert('Progression locale nettoyée.');
-  location.reload();
+  showToast('Progression locale nettoyée.', 'info');
+  setTimeout(() => location.reload(), 450);
 }
 
 // Lancer l'application
@@ -686,16 +695,12 @@ window.addEventListener('message', async (e) => {
       await saveScoreForUser(lvl, sc);
       showLeaderboard(lvl);
       if (unlocked)
-        alert(
-          `✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`,
-        );
+        showToast(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`, 'info');
       else
-        alert(
-          `⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
-        );
+        showToast(`⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`, 'warning');
     } else {
-      alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
-      window.location.href = '/index.html';
+      showToast("⚠️ Vous devez être connecté pour sauvegarder vos scores.", 'warning');
+      setTimeout(() => (window.location.href = '/index.html'), 350);
     }
   } catch (err) {
     console.log('Erreur en traitant le message du jeu', err);
@@ -750,13 +755,11 @@ window.addEventListener('message', async (e) => {
         await saveScoreForUser(lvl, sc);
         showLeaderboard(lvl);
         if (unlocked)
-          alert(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`);
+          showToast(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`, 'info');
         else
-          alert(
-            `⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
-          );
+          showToast(`⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`, 'warning');
       } else {
-        alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
-        window.location.href = '/index.html';
+        showToast("⚠️ Vous devez être connecté pour sauvegarder vos scores.", 'warning');
+        setTimeout(() => (window.location.href = '/index.html'), 350);
       }
     }
