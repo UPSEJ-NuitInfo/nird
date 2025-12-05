@@ -41,31 +41,91 @@ body {
 .map-wrapper {
   width: 100%;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
+  /* make the wrapper a positioned container so children can be absolutely placed */
+  position: relative;
+  display: block;
   background: linear-gradient(135deg, var(--primary) 0%, var(--candy-purple) 100%);
+  overflow: hidden;
 }
 
 /* ===== HEADER ===== */
 .map-header {
-  text-align: center;
-  padding: 20px;
+  /* Header overlay: compact city-style badge */
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 10px 14px;
+  color: #ffffff;
+  z-index: 4; /* below .path (z-index:10) and .player (z-index:15) */
+  /* keep header fully transparent so it blends with the page background */
+  background: transparent;
+  border-radius: 999px;
+  backdrop-filter: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* small logo circle in the header (emoji skyline) */
+.map-header::before {
+  content: '🏙️';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--candy-blue), var(--candy-purple));
   color: white;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 20;
+  font-size: 20px;
+  margin-right: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.map-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* background only behind the title block */
+  background: rgba(6,24,38,0.6);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 8px; /* give some breathing space under the badge */
 }
 
 .map-header h1 {
-  font-size: 2.5em;
+  font-size: 1.12em;
   font-weight: 900;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
+  margin: 0;
+  letter-spacing: 0.6px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
 }
 
 .map-header p {
-  font-size: 1em;
-  opacity: 0.95;
-  font-weight: 500;
+  font-size: 0.8em;
+  opacity: 0.9;
+  font-weight: 600;
+  margin: 0;
+  color: rgba(255,255,255,0.9);
+}
+
+/* Ensure profile area stays above nodes so it's clickable */
+.profile-area {
+  position: absolute;
+  top: 12px;
+  right: 80px; /* moved left so not at the very edge */
+  z-index: 900; /* keep above nodes and header */
+}
+
+/* remove extra border/glow so header matches page background */
+.map-header {
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 /* ===== PROFILE AREA ===== */
@@ -81,8 +141,8 @@ body {
 .profile-area {
   position: absolute;
   top: 12px;
-  right: 18px;
-  z-index: 30;
+  right: 80px; /* moved left so not at the very edge */
+  z-index: 900;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -92,13 +152,14 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.95);
-  color: var(--primary);
-  padding: 6px 10px;
+  background: linear-gradient(135deg, var(--candy-blue), var(--primary));
+  color: white;
+  padding: 6px 12px;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(6,24,38,0.24);
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .profile-avatar {
@@ -108,9 +169,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--candy-pink), var(--candy-purple));
+  background: linear-gradient(135deg, var(--candy-pink), var(--candy-blue));
   color: white;
   font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
 }
 
 .profile-name {
@@ -249,23 +311,29 @@ body {
 }
 
 /* ===== STATS ===== */
+/* ensure no double background causing double-contour */
 .map-stats {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 15px 20px;
-  flex-wrap: wrap;
-  z-index: 20;
+  gap: 12px;
+  padding: 4px;
+  z-index: 210;
+  background: transparent; /* let individual stat-cards carry their own background to avoid double contour */
+  border-radius: 999px;
+  align-items: center;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 10px 18px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   min-width: 90px;
+  border: 1px solid rgba(0,0,0,0.04);
 }
 
 .stat-label {
@@ -286,47 +354,70 @@ body {
   background-clip: text;
 }
 
+/* fix: ensure stat-card label/value have no extra outlines */
+.stat-card, .map-stats { outline: none; }
+
 /* ===== MAP CANVAS ===== */
 .map-canvas {
-  position: relative;
-  flex: 1;
+  /* full-viewport map canvas positioned under overlays */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.3) 0%, transparent 50%),
-    linear-gradient(180deg, #fff9e6 0%, #ffe4b5 50%, #ffd699 100%);
-  border-radius: 20px 20px 0 0;
-  margin: 0 15px;
+  background:
+    radial-gradient(circle at 25% 35%, rgba(251, 191, 36, 0.14) 0%, transparent 35%),
+    radial-gradient(circle at 78% 75%, rgba(249, 115, 22, 0.12) 0%, transparent 40%),
+    linear-gradient(180deg, #f6f8fb 0%, #eef3f7 50%, #e6eef5 100%);
+  margin: 0;
   overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* Motif Candy Crush */
 .map-canvas::before {
+  /* subtle street/grid pattern to give a map-like feeling */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px),
-    repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 24px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 24px);
+  mix-blend-mode: overlay;
   pointer-events: none;
   z-index: 1;
 }
 
+.map-canvas::after {
+  /* soft skyline/buildings silhouette at the bottom to suggest a city map */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.03) 40%, rgba(0,0,0,0.06) 100%);
+  pointer-events: none;
+  z-index: 2;
+  mask-image: linear-gradient(180deg, transparent 0%, black 30%);
+}
+
 /* Centered stage inside the canvas used for absolute-positioned nodes */
 .map-stage {
-  width: min(1100px, 92%);
-  height: min(700px, 72vh);
+  width: min(1200px, 92%);
+  height: min(820px, 86vh);
   position: relative;
-  margin: 20px auto;
-  background: transparent;
-  border-radius: 12px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.02);
+  border-radius: 18px;
   display: block;
+  z-index: 5; /* sits above subtle map textures */
 }
 
 /* ===== LEVELS / NODES ===== */
@@ -450,17 +541,28 @@ body {
 
 /* ===== FOOTER ===== */
 .map-footer {
-  padding: 15px 20px 20px;
-  /* z-index removed to not block dropdown */
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  padding: 12px 24px;
+  z-index: 200;
+  display: flex;
+  justify-content: center; /* center controls horizontally */
+  align-items: center;
+  pointer-events: none; /* allow internal items to control pointer events */
 }
 
 .level-card {
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
   background: rgba(255, 255, 255, 0.95);
-  padding: 20px 26px;
+  padding: 16px 20px;
   border-radius: 12px;
   border-left: 6px solid var(--primary);
-  margin-bottom: 14px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  pointer-events: auto;
 }
 
 .level-card h3 {
@@ -479,6 +581,7 @@ body {
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  pointer-events: auto; /* re-enable clicks on controls */
 }
 
 /* ===== BUTTONS ===== */
