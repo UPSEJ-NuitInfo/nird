@@ -90,7 +90,7 @@ body {
   flex-direction: column;
   gap: 2px;
   /* keep title block transparent so it blends with the page */
-  background: transparent;
+  background: linear-gradient(135deg, var(--candy-yellow), var(--primary));;
   padding: 4px 6px;
   border-radius: 8px;
   margin-bottom: 6px;

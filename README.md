@@ -1,35 +1,48 @@
 # README
 
-Nuit de l'Info 2025
-Réalisé par l'équipe `UPSEJ` de l'`Université Savoie Mont-Blanc`
+## 🌙 Nuit de l'Info 2025  
+Réalisé par l'équipe **UPSEJ** de l'**Université Savoie Mont-Blanc**
 
-Le site est disponible à l'adresse suivante : [https://upsej.site](https://upsej.site)
+---
 
-Projet hébergé chez Infomaniak : [https://www.infomaniak.com/](https://www.infomaniak.com/)
+## 🔗 Accès au site
 
-## Description du projet
+➡️ https://upsej.site  
+Projet hébergé chez Infomaniak : https://www.infomaniak.com/  
 
-TODO
+💻 Sources disponibles sur GitHub : [https://github.com/UPSEJ-NuitInfo/nird](https://github.com/UPSEJ-NuitInfo/nird)
 
-## Technologies utilisées
+---
 
-Backend :
+## 🎮 Description du projet
 
-- Node.js
-- Express.js
-- MariaDB
+Notre projet est un site web composé de **plusieurs mini-jeux**, créés autour du thème national de la Nuit de l’Info.  
+Votre mission : **battre les GAFAM** en explosant leurs scores et en dominant le leaderboard 💥
 
-Frontend :
+### Fonctionnalités principales :
 
-- HTML5
-- CSS3
-- JavaScript
+- 5+ mini-jeux originaux
+- Scores enregistrés et **classement en ligne**
+- Une touche **rétro-gaming**
+- Expérience multi-défis avec progression du joueur
+- Accessible publiquement sur navigateur
 
-## Installation
+### Objectif du joueur :
 
-```bash
-git clone https://github.com/UPSEJ-NuitInfo/nird.git
-cd nird
-npm i
-npm start
-```
+> Jouez → Scorez → Grimpez dans le classement → Battez les GAFAM… et vos amis !
+
+---
+
+## 🧩 Technologies utilisées
+
+### Backend :
+
+- Node.js  
+- Express.js  
+- MariaDB  
+
+### Frontend :
+
+- HTML5  
+- CSS3  
+- JavaScript  
