@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Game, HighScore, User } = require('../database/models');
+const { Game, Highscore, User } = require('../database/models');
 const { authenticateToken } = require('./auth');
 
 // ============================================

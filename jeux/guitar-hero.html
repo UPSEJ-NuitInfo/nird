@@ -461,11 +461,9 @@
         // Allow manual finish: send current score to opener and close
         function sendScoreAndClose() {
             try {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({ type: 'nird-game-score', level: 3, score: score }, '*');
-                }
+                const url = `/map?level=3&score=${encodeURIComponent(score)}`;
+                window.location.href = url;
             } catch (e) {}
-            try { window.close(); } catch (e) {}
         }
 
     </script>

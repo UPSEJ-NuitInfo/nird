@@ -269,12 +269,6 @@
             canard.classList.remove("saut-anim");
             scoreFinalSpan.innerText = score;
             gameOverDiv.style.display = "block";
-            // Send score to opener (map) if opened from there
-            try {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({ type: 'nird-game-score', level: 1, score: score }, '*');
-                }
-            } catch (e) { /* ignore */ }
         }
 
         function relancerJeu() {
@@ -293,12 +287,9 @@
 
         function sendScoreAndClose() {
             try {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({ type: 'nird-game-score', level: 1, score: score }, '*');
-                }
+                const url = `/map?level=1&score=${encodeURIComponent(score)}`;
+                window.location.href = url;
             } catch (e) { }
-            // close the window (works when opened via window.open)
-            try { window.close(); } catch (e) { /* ignore */ }
         }
 
         creerObstacle();

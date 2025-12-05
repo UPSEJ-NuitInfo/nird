@@ -247,12 +247,6 @@
             gameRunning = false;
             document.getElementById('final-score').innerText = score;
             document.getElementById('game-over').style.display = 'block';
-            // send score to opener
-            try {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({ type: 'nird-game-score', level: 2, score: score }, '*');
-                }
-            } catch(e) {}
         }
 
         function updateUI() {
@@ -374,11 +368,9 @@
 
         function sendScoreAndClose() {
             try {
-                if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({ type: 'nird-game-score', level: 2, score: score }, '*');
-                }
+                const url = `/map?level=2&score=${encodeURIComponent(score)}`;
+                window.location.href = url;
             } catch (e) {}
-            try { window.close(); } catch (e) {}
         }
 
     </script>

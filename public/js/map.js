@@ -215,16 +215,15 @@ function playLevel() {
   // If there's a real game file, open it in a new tab; otherwise show placeholder alert
   const gameFile = gameFiles[levelId];
   if (gameFile) {
+    // Navigate directly to the game route (no iframe/modal)
     try {
-      // Open the game in a new tab/window WITHOUT 'noopener' so the child can postMessage back to opener
-      window.open(gameFile, '_blank');
+      window.location.href = gameFile;
     } catch (e) {
-      // fallback
       alert(
         `🎮 Niveau ${levelId}: ${level.name}\n\n(Le jeu s'ouvrira dans un nouvel onglet)`,
       );
     }
-    // For real game files we wait for the child window to post back the score
+    // The game page will redirect back to /map?level=<id>&score=<score>
     return;
   } else {
     alert(
@@ -261,10 +260,9 @@ function playLevel() {
     updateLevelInfo();
 
     // If the user is already logged in, save score immediately for the completed level (or partial score)
-    setTimeout(() => {
-      if (currentUser) {
-        localStorage.setItem('nirdUser', JSON.stringify(currentUser));
-        saveScoreForUser(currentUser, pendingLevelId, pendingLevelScore);
+    setTimeout(async () => {
+      if (currentUser && localStorage.getItem('token')) {
+        await saveScoreForUser(pendingLevelId, pendingLevelScore);
         showLeaderboard(pendingLevelId);
         if (unlocked)
           alert(
@@ -275,14 +273,17 @@ function playLevel() {
             `⚠️ Score enregistré (${pendingLevelScore}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
           );
       } else {
-        // otherwise open auth modal to register the score
-        openAuthModal();
+        // otherwise prompt to login
+        alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
+        window.location.href = '/index.html';
       }
     }, 600);
   } else {
     alert('✓ Ce niveau est déjà complété!');
   }
 }
+
+// (iframe/modal launch removed — games are opened via direct navigation to `/jeux/*`)
 
 // ===== RÉINITIALISER =====
 function resetProgress() {
@@ -298,115 +299,33 @@ function resetProgress() {
   }
 }
 
-// ===== AUTHENTIFICATION & LEADERBOARD =====
-function openAuthModal() {
-  document.getElementById('authModal').classList.remove('hidden');
-  // Prefill the level score display and hidden input
-  document.getElementById('authForm').reset();
-  // Prefill the level score display and hidden input
-  const scoreDisplay = document.getElementById('levelScoreDisplay');
-  const scoreInput = document.getElementById('levelScore');
-  if (scoreDisplay) scoreDisplay.textContent = pendingLevelScore || 0;
-  if (scoreInput) scoreInput.value = pendingLevelScore || 0;
-}
-
-function closeAuthModal() {
-  document.getElementById('authModal').classList.add('hidden');
-}
-
+// ===== LEADERBOARD =====
 function closeLeaderboardModal() {
   document.getElementById('leaderboardModal').classList.add('hidden');
-}
-
-async function submitAuth(event) {
-  event.preventDefault();
-
-  const username = document.getElementById('username').value;
-  const email = document.getElementById('email').value;
-  const school = document.getElementById('school').value;
-  // Use the pendingLevelId (the level that was just completed)
-  const levelId = pendingLevelId || gameState.currentLevel;
-  // read submitted level score (prefilled)
-  const levelScoreInput = document.getElementById('levelScore');
-  const levelScore =
-    parseInt(levelScoreInput && levelScoreInput.value) ||
-    pendingLevelScore ||
-    0;
-
-  // Capture the completed level ID BEFORE anything else
-  const completedLevelId = levelId;
-
-  // Créer l'objet utilisateur
-  currentUser = {
-    username,
-    email,
-    school,
-    completedLevels: gameState.completedLevels.length,
-    level: levelId,
-    score: levelScore,
-    timestamp: new Date().toISOString(),
-  };
-
-  // Sauvegarder dans localStorage (utilisateur)
-  localStorage.setItem('nirdUser', JSON.stringify(currentUser));
-
-  // Ajouter au leaderboard local pour ce niveau — garder le meilleur score par email
-  saveScoreForUser(currentUser, levelId, levelScore);
-
-  // Envoyer au serveur (optionnel - pour la BDD)
-  try {
-    await fetch('/api/leaderboard/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(currentUser),
-    }).catch((err) => console.log('BDD non disponible, mode local'));
-  } catch (err) {
-    console.log('Score sauvegardé localement');
-  }
-
-  closeAuthModal();
-  // Use the captured completedLevelId (not pendingLevelId which is now cleared)
-  showLeaderboard(completedLevelId);
-  alert(
-    `✨ Bravo ${username}!\nVotre score a été enregistré pour le niveau ${completedLevelId}!`,
-  );
 }
 
 async function showLeaderboard(levelId = null) {
   // levelId par défaut = niveau courant
   if (!levelId) levelId = gameState.currentLevel;
 
-  let remoteData = [];
-  // Récupérer les données du leaderboard (depuis la BDD ou localStorage par niveau)
+  const token = localStorage.getItem('token');
+  leaderboardData = [];
+
+  // Récupérer le classement depuis l'API (utilise le gameId = levelId)
   try {
-    const res = await fetch(`/api/leaderboard?level=${levelId}`);
-    if (res.ok) remoteData = await res.json();
+    const res = await fetch(`/api/games/${levelId}/leaderboard`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      leaderboardData = data.leaderboard || [];
+    }
   } catch (err) {
-    // ignore, on utilisera local
+    console.error('Erreur chargement leaderboard:', err);
   }
-
-  const key = `leaderboardData_level_${levelId}`;
-  const local = JSON.parse(localStorage.getItem(key) || '[]');
-
-  // Prioriser remote si présent, sinon local
-  leaderboardData = remoteData && remoteData.length ? remoteData : local;
-
-  // Ajouter l'utilisateur actuel s'il existe et n'est pas déjà présent
-  if (
-    currentUser &&
-    currentUser.level === levelId &&
-    !leaderboardData.find((u) => u.email === currentUser.email)
-  ) {
-    leaderboardData.push(currentUser);
-  }
-
-  // Trier par score décroissant
-  leaderboardData.sort((a, b) => (b.score || 0) - (a.score || 0));
-
-  // Sauvegarder localement
-  localStorage.setItem(key, JSON.stringify(leaderboardData));
 
   // Afficher le leaderboard
   displayLeaderboard(levelId);
@@ -423,7 +342,6 @@ function displayLeaderboard(levelId) {
   html += '<div class="leaderboard-header">';
   html += '<div>Rang</div>';
   html += '<div>Pseudo</div>';
-  html += '<div>École</div>';
   html += '<div>Score</div>';
   html += '</div>';
 
@@ -431,17 +349,16 @@ function displayLeaderboard(levelId) {
     html +=
       '<div style="padding:16px;text-align:center;color:var(--neutral);">Aucun score pour ce niveau — soyez le premier !</div>';
   } else {
-    leaderboardData.slice(0, 50).forEach((user, index) => {
+    leaderboardData.slice(0, 50).forEach((entry) => {
       let rankClass = '';
-      if (index === 0) rankClass = 'top-1 medal-1';
-      else if (index === 1) rankClass = 'top-2 medal-2';
-      else if (index === 2) rankClass = 'top-3 medal-3';
+      if (entry.rank === 1) rankClass = 'top-1 medal-1';
+      else if (entry.rank === 2) rankClass = 'top-2 medal-2';
+      else if (entry.rank === 3) rankClass = 'top-3 medal-3';
 
       html += `<div class="leaderboard-row ${rankClass}">`;
-      html += `<div class="leaderboard-rank">${index + 1}</div>`;
-      html += `<div class="leaderboard-name">${user.username}</div>`;
-      html += `<div class="leaderboard-school">${user.school || '-'}</div>`;
-      const displayScore = user.score != null ? `${user.score}` : `-`;
+      html += `<div class="leaderboard-rank">${entry.rank}</div>`;
+      html += `<div class="leaderboard-name">${entry.username}</div>`;
+      const displayScore = entry.score != null ? `${entry.score}` : `-`;
       html += `<div class="leaderboard-score">${displayScore}</div>`;
       html += '</div>';
     });
@@ -450,64 +367,61 @@ function displayLeaderboard(levelId) {
   content.innerHTML = html;
 }
 
-// Save a score for a user for a specific level (keep best score per email)
-function saveScoreForUser(user, levelId, levelScore) {
-  if (!user || !user.email) return;
-  const key = `leaderboardData_level_${levelId}`;
-  const local = JSON.parse(localStorage.getItem(key) || '[]');
-  const now = new Date().toISOString();
-
-  let entry = local.find((u) => u.email === user.email);
-  if (!entry) {
-    entry = {
-      username: user.username,
-      email: user.email,
-      school: user.school || '',
-      score: levelScore,
-      timestamp: now,
-      level: levelId,
-    };
-    local.push(entry);
-  } else {
-    // update only if new score is better
-    if ((levelScore || 0) > (entry.score || 0)) {
-      entry.score = levelScore;
-      entry.timestamp = now;
-    }
+// Save a score for a user to a specific level (gameId = levelId) via API
+async function saveScoreForUser(levelId, levelScore) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('Token manquant, score non sauvegardé');
+    return;
   }
 
-  // sort by score desc
-  local.sort((a, b) => (b.score || 0) - (a.score || 0));
-  localStorage.setItem(key, JSON.stringify(local));
-
-  // attempt to POST to server endpoint (non-blocking)
   try {
-    fetch('/api/leaderboard/add', {
+    const res = await fetch(`/api/games/${levelId}/score`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: entry.username,
-        email: entry.email,
-        school: entry.school,
-        score: entry.score,
-        level: levelId,
-      }),
-    }).catch(() => {
-      /* ignore */
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ score: levelScore }),
     });
-  } catch (e) {
-    // ignore
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log(
+        `Score ${levelScore} enregistré pour le niveau ${levelId}: ${data.message}`,
+      );
+      return data;
+    } else {
+      console.error("Erreur lors de l'enregistrement du score:", res.status);
+    }
+  } catch (err) {
+    console.error('Erreur saveScoreForUser:', err);
   }
+
   // clear pending values
   pendingLevelId = null;
   pendingLevelScore = 0;
 }
 
-// Charger l'utilisateur actuel au démarrage
+// Load current user from JWT token (stored in localStorage)
 function loadCurrentUser() {
-  const saved = localStorage.getItem('nirdUser');
-  if (saved) {
-    currentUser = JSON.parse(saved);
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // No token = not logged in, redirect handled at top of file
+    return;
+  }
+
+  try {
+    // Decode JWT to extract user info (basic decode, no verification needed client-side)
+    const parts = token.split('.');
+    if (parts.length !== 3) return;
+    const payload = JSON.parse(atob(parts[1]));
+    currentUser = {
+      id: payload.id,
+      username: payload.username,
+    };
+  } catch (err) {
+    console.error('Erreur décodage JWT:', err);
   }
 }
 
@@ -528,8 +442,7 @@ function renderProfileArea() {
     const content = document.createElement('div');
     content.className = 'user-panel-content';
     content.innerHTML = `
-            <p><strong>Email:</strong><br>${currentUser.email}</p>
-            <p><strong>École:</strong><br>${currentUser.school || '-'}</p>
+            <p><strong>Utilisateur ID:</strong> ${currentUser.id}</p>
         `;
     panel.appendChild(content);
 
@@ -579,7 +492,7 @@ function renderProfileArea() {
     const loginBtn = document.createElement('button');
     loginBtn.className = 'btn-panel-primary';
     loginBtn.textContent = '✓ Se connecter';
-    loginBtn.addEventListener('click', () => openAuthModal());
+    loginBtn.addEventListener('click', () => { window.location.href = '/index.html'; });
 
     const actions = document.createElement('div');
     actions.className = 'user-panel-actions';
@@ -599,8 +512,7 @@ function openProfileModal() {
   } else {
     content.innerHTML = `
             <p><strong>Pseudo:</strong> ${currentUser.username}</p>
-            <p><strong>Email:</strong> ${currentUser.email}</p>
-            <p><strong>École:</strong> ${currentUser.school || '-'}</p>
+            <p><strong>ID:</strong> ${currentUser.id}</p>
         `;
   }
   modal.classList.remove('hidden');
@@ -612,27 +524,39 @@ function closeProfileModal() {
 }
 
 // Show all scores for current user across all levels
-function showMyAllScores() {
+async function showMyAllScores() {
   if (!currentUser) {
     alert("Connectez-vous d'abord");
     return;
   }
 
-  // Collect all scores from all levels
+  const token = localStorage.getItem('token');
   const allScores = [];
-  for (let levelId = 1; levelId <= levels.length; levelId++) {
-    const key = `leaderboardData_level_${levelId}`;
-    const local = JSON.parse(localStorage.getItem(key) || '[]');
-    const myEntry = local.find((u) => u.email === currentUser.email);
-    if (myEntry) {
-      allScores.push({
-        level: levelId,
-        levelName: levels[levelId - 1]?.name || `Niveau ${levelId}`,
-        levelIcon: levels[levelId - 1]?.icon || '🎮',
-        score: myEntry.score || 0,
-        rank: local.indexOf(myEntry) + 1,
-      });
+
+  try {
+    const res = await fetch(`/api/users/${currentUser.id}/scores`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // data.scores is an array of { gameId, gameName, score, updatedAt }
+      if (data.scores && data.scores.length > 0) {
+        data.scores.forEach((s) => {
+          const level = levels.find((l) => l.id === s.gameId);
+          allScores.push({
+            gameId: s.gameId,
+            gameName: s.gameName || `Niveau ${s.gameId}`,
+            levelIcon: level?.icon || '🎮',
+            score: s.score || 0,
+          });
+        });
+      }
     }
+  } catch (err) {
+    console.error('Erreur chargement mes scores:', err);
   }
 
   // Display in modal
@@ -641,7 +565,6 @@ function showMyAllScores() {
   html += '<div class="leaderboard-header">';
   html += '<div>Niveau</div>';
   html += '<div>Score</div>';
-  html += '<div>Rang</div>';
   html += '</div>';
 
   if (allScores.length === 0) {
@@ -650,9 +573,8 @@ function showMyAllScores() {
   } else {
     allScores.forEach((s) => {
       html += `<div class="leaderboard-row">`;
-      html += `<div>${s.levelIcon} ${s.levelName}</div>`;
+      html += `<div>${s.levelIcon} ${s.gameName}</div>`;
       html += `<div style="text-align:center;">${s.score}</div>`;
-      html += `<div style="text-align:center;">#${s.rank}</div>`;
       html += '</div>';
     });
   }
@@ -662,32 +584,32 @@ function showMyAllScores() {
 }
 
 function logout() {
-  localStorage.removeItem('nirdUser');
+  localStorage.removeItem('token');
   currentUser = null;
   renderProfileArea();
   alert('Déconnecté.');
+  window.location.href = '/index.html';
 }
 
 function clearAppStorage() {
   if (
     !confirm(
-      'Supprimer toutes les données locales (profil, progression, leaderboards) ?',
+      'Supprimer toutes les données locales (progression, leaderboards locaux) ?',
     )
   )
     return;
-  localStorage.removeItem('nirdUser');
   localStorage.removeItem('candyMapState');
-  // remove all leaderboard keys
+  // remove all old leaderboard keys (for cleanup)
   for (let i = localStorage.length - 1; i >= 0; i--) {
     const k = localStorage.key(i);
     if (k && k.startsWith('leaderboardData_level_')) localStorage.removeItem(k);
   }
-  alert('Local storage nettoyé.');
+  alert('Progression locale nettoyée.');
   location.reload();
 }
 
 // Lancer l'application
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadCurrentUser();
   renderProfileArea();
   // check URL param ?reset=1 to clear storage immediately
@@ -698,11 +620,31 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
   } catch (e) {}
-  init();
+
+  // init (loads thresholds, state, UI)
+  await init();
+
+  // After init, check URL params for an incoming score (from a game redirect)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const lvl = params.has('level') ? parseInt(params.get('level'), 10) : null;
+    const sc = params.has('score') ? parseInt(params.get('score'), 10) : null;
+    if (lvl && !isNaN(sc)) {
+      // handle the incoming score and then remove params from URL
+      await handleGameScore(lvl, sc);
+      // Clean the URL to avoid reprocessing on refresh
+      const url = new URL(window.location.href);
+      url.searchParams.delete('level');
+      url.searchParams.delete('score');
+      history.replaceState({}, document.title, url.pathname + url.search);
+    }
+  } catch (e) {
+    console.error('Erreur parsing URL params:', e);
+  }
 });
 
 // Listen for scores posted by child game windows (via window.open)
-window.addEventListener('message', (e) => {
+window.addEventListener('message', async (e) => {
   try {
     const data = e.data;
     if (!data || data.type !== 'nird-game-score') return;
@@ -731,10 +673,17 @@ window.addEventListener('message', (e) => {
       unlocked = true;
     }
 
-    // If user logged in, save immediately; otherwise open auth modal
-    if (currentUser) {
-      localStorage.setItem('nirdUser', JSON.stringify(currentUser));
-      saveScoreForUser(currentUser, lvl, sc);
+    // If the game was opened in the iframe overlay, remove it now
+    try {
+      const ov = document.getElementById('gameIframeOverlay');
+      if (ov) ov.remove();
+    } catch (e) {
+      /* ignore */
+    }
+
+    // If user logged in (has token), save to DB immediately; otherwise redirect to login
+    if (currentUser && localStorage.getItem('token')) {
+      await saveScoreForUser(lvl, sc);
       showLeaderboard(lvl);
       if (unlocked)
         alert(
@@ -745,9 +694,69 @@ window.addEventListener('message', (e) => {
           `⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
         );
     } else {
-      openAuthModal();
+      alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
+      window.location.href = '/index.html';
     }
   } catch (err) {
     console.log('Erreur en traitant le message du jeu', err);
   }
 });
+    window.addEventListener('message', async (e) => {
+      try {
+        const data = e.data;
+        if (!data || data.type !== 'nird-game-score') return;
+        const lvl = parseInt(data.level, 10);
+        const sc = parseInt(data.score, 10) || 0;
+        await handleGameScore(lvl, sc);
+      } catch (err) {
+        console.log('Erreur en traitant le message du jeu', err);
+      }
+    });
+
+    // Central handler for game scores (from postMessage or URL redirect)
+    async function handleGameScore(lvl, sc) {
+      // set pending values
+      pendingLevelId = lvl;
+      pendingLevelScore = sc;
+
+      const threshold =
+        parseInt(levelThresholds[lvl] || levelThresholds[String(lvl)] || 0, 10) || 0;
+      let unlocked = false;
+
+      // mark level completed locally only if score meets threshold
+      if (sc >= threshold) {
+        if (!gameState.completedLevels.includes(lvl)) {
+          gameState.completedLevels.push(lvl);
+        }
+        if (lvl < levels.length) {
+          gameState.currentLevel = Math.max(gameState.currentLevel, lvl + 1);
+        }
+        saveGameState();
+        initMap();
+        updateLevelInfo();
+        unlocked = true;
+      }
+
+      // If the game was opened in the iframe overlay, remove it now
+      try {
+        const ov = document.getElementById('gameIframeOverlay');
+        if (ov) ov.remove();
+      } catch (e) {
+        /* ignore */
+      }
+
+      // If user logged in (has token), save to DB immediately; otherwise redirect to login
+      if (currentUser && localStorage.getItem('token')) {
+        await saveScoreForUser(lvl, sc);
+        showLeaderboard(lvl);
+        if (unlocked)
+          alert(`✨ Score enregistré et niveau débloqué pour ${currentUser.username} (${sc})`);
+        else
+          alert(
+            `⚠️ Score enregistré (${sc}). Score minimum pour débloquer le niveau suivant: ${threshold}`,
+          );
+      } else {
+        alert("⚠️ Vous devez être connecté pour sauvegarder vos scores.");
+        window.location.href = '/index.html';
+      }
+    }

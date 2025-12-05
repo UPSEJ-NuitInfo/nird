@@ -11,11 +11,11 @@ async function seed() {
     console.log('Création des jeux...');
 
     const games = await Game.bulkCreate([
-      { id: 1, name: 'Quiz NIRD - Sensibilisation' },
-      { id: 2, name: 'Matching Game - Alternatives Libres' },
-      { id: 3, name: 'Typing Challenge - Commandes Linux' },
-      { id: 4, name: 'Memory - Logos Open Source' },
-      { id: 5, name: 'Code Breaker - Défis Algorithmiques' },
+      { id: 1, name: 'Dino' },
+      { id: 2, name: 'Fruit Ninja' },
+      { id: 3, name: 'Guitar Hero' },
+      { id: 4, name: 'Taupe Taupe' },
+      { id: 5, name: 'Laser Game' },
     ]);
 
     console.log(`✅ ${games.length} jeux créés`);
@@ -40,9 +40,9 @@ async function seed() {
     console.log('Création scores de démo...');
 
     await Highscore.bulkCreate([
-      { id_user: demoUser.id, id_game: 1, score: 850 },
-      { id_user: demoUser.id, id_game: 2, score: 1200 },
-      { id_user: demoUser.id, id_game: 3, score: 3400 },
+      { id_user: demoUser.id, id_game: 1, score: 22 },
+      { id_user: demoUser.id, id_game: 2, score: 80 },
+      { id_user: demoUser.id, id_game: 3, score: 134000 },
     ]);
 
     console.log('✅ 3 scores de démo créés');
