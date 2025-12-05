@@ -373,6 +373,21 @@
             } catch (e) {}
         }
 
+
+        let saisie = "";
+        document.addEventListener('keydown', (e) => {
+        saisie += e.key.toLowerCase();
+        
+        if (!"bouton".startsWith(saisie)) {
+            saisie = e.key.toLowerCase() === 'b' ? 'b' : '';
+        }
+
+        // Si le mot est complet
+        if (saisie === "bouton") {
+            window.location.href = "boutonCssFou.html";
+        }
+});
+
     </script>
 </body>
 </html>
