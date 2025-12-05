@@ -223,10 +223,10 @@
             
             // Crée 1 ou 2 entités
             entities.push(new Entity());
-            if (Math.random() > 0.9 && score > 10) entities.push(new Entity());
+            if (Math.random() > 0.7 && score > 10) entities.push(new Entity());
 
             // Accélération du jeu
-            let nextSpawn = 1000 - (score * 2); 
+            let nextSpawn = 1000 - (score * 5); 
             if (nextSpawn < 400) nextSpawn = 400;
 
             setTimeout(spawnLoop, nextSpawn);
@@ -363,30 +363,31 @@
             canvas.height = window.innerHeight;
         });
 
-        // Démarrage initial
-        startGame();
-
         function sendScoreAndClose() {
             try {
+                // Redirection vers la carte avec le score en paramètre
                 const url = `/map?level=2&score=${encodeURIComponent(score)}`;
                 window.location.href = url;
             } catch (e) {}
         }
 
+        // Démarrage initial
+        startGame();
 
         let saisie = "";
         document.addEventListener('keydown', (e) => {
-        saisie += e.key.toLowerCase();
-        
-        if (!"bouton".startsWith(saisie)) {
-            saisie = e.key.toLowerCase() === 'b' ? 'b' : '';
-        }
+            saisie += e.key.toLowerCase();
+            
+            // Si la saisie ne correspond pas au début de "bouton", on réinitialise
+            if (!"bouton".startsWith(saisie)) {
+                saisie = e.key.toLowerCase() === 'b' ? 'b' : '';
+            }
 
-        // Si le mot est complet
-        if (saisie === "bouton") {
-            window.location.href = "boutonCss.html";
-        }
-});
+            // Si le mot est complet
+            if (saisie === "bouton") {
+                window.location.href = "boutonCss.html";
+            }
+        });
 
     </script>
 </body>
