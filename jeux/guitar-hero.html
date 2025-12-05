@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Duck Hero: Survival Mode</title>
+    <title>Duck Hero: Hardcore Mode</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
 
@@ -21,83 +21,31 @@
         }
 
         /* --- SCÈNE --- */
-        #stage {
-            position: absolute;
-            top: 20px;
-            text-align: center;
-            z-index: 0;
-        }
+        #stage { position: absolute; top: 20px; text-align: center; z-index: 0; }
         #duck-avatar {
-            font-size: 100px;
-            display: inline-block;
-            filter: drop-shadow(0 0 20px #FFD700);
-            transition: transform 0.1s;
+            font-size: 100px; display: inline-block;
+            filter: drop-shadow(0 0 20px #FFD700); transition: transform 0.1s;
         }
 
         /* --- HUD --- */
-        #ui {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            text-align: right;
-            z-index: 10;
-        }
+        #ui { position: absolute; top: 20px; right: 20px; text-align: right; z-index: 10; }
         #score { font-size: 50px; color: #FFD700; text-shadow: 0 0 10px #FFD700; }
         #combo { font-size: 25px; color: #00e5ff; }
         #multiplier { font-size: 35px; color: #ff0055; margin-top: 5px; }
         
-        /* VIES (NOUVEAU) */
-        #lives-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            text-align: left;
-        }
+        #lives-container { position: absolute; top: 20px; left: 20px; z-index: 10; text-align: left; }
         #lives-label { font-size: 20px; color: #aaa; }
         #lives-count { font-size: 40px; color: #00ff00; text-shadow: 0 0 10px #00ff00; }
-        
-        /* Quand il reste peu de vies */
         .danger { color: #ff0000 !important; text-shadow: 0 0 20px #ff0000 !important; animation: pulse 0.5s infinite; }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* INFO VITESSE */
-        #speed-info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            font-size: 20px;
-            color: #aaa;
-            z-index: 10;
-        }
-
-        /* ALERTE VITESSE */
-        #speed-alert {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 80px;
-            color: #ff0055;
-            text-shadow: 0 0 20px white;
-            z-index: 50;
-            pointer-events: none;
-            transition: transform 0.5s;
-        }
-        .zoom-effect { transform: translate(-50%, -50%) scale(1) !important; }
+        #speed-info { position: absolute; bottom: 20px; left: 20px; font-size: 20px; color: #aaa; z-index: 10; }
 
         /* --- FRETBOARD --- */
         #fretboard-container { perspective: 600px; margin-top: 100px; }
         #fretboard {
-            width: 500px; height: 600px;
-            background: linear-gradient(to bottom, #1a1a1a 0%, #000 100%);
-            transform: rotateX(50deg);
-            border-left: 5px solid #444; border-right: 5px solid #444;
+            width: 500px; height: 600px; background: linear-gradient(to bottom, #1a1a1a 0%, #000 100%);
+            transform: rotateX(50deg); border-left: 5px solid #444; border-right: 5px solid #444;
             display: flex; justify-content: space-around; overflow: hidden;
             position: relative; box-shadow: 0 50px 50px rgba(0,0,0,0.8);
         }
@@ -164,11 +112,11 @@
 </head>
 <body>
 
-    <audio id="bg-music" src="canard.mp3" preload="auto"></audio>
+    <audio id="bg-music" src="canard.mp3" loop preload="auto"></audio>
 
     <div id="start-screen">
         <h1 style="font-size: 70px; color: #FFD700; margin: 0;">DUCK HERO</h1>
-        <h2 style="color: white;">SURVIVAL MODE</h2>
+        <h2 style="color: white;">HARDCORE MODE</h2>
         <p style="color: #aaa; margin-top: 20px;">Place tes doigts sur :</p>
         <div class="keys-info">
             <div class="key-box" style="border-color: #00ff00;">D</div>
@@ -176,7 +124,6 @@
             <div class="key-box" style="border-color: #ffff00;">J</div>
             <div class="key-box" style="border-color: #0000ff;">K</div>
         </div>
-        <p style="color: red; margin-bottom: 20px;">10 ERREURS MAX !</p>
         <button onclick="startGame()">JOUER ! 🤘</button>
     </div>
 
@@ -199,7 +146,6 @@
     </div>
 
     <div id="speed-info">VITESSE: 100%</div>
-    <div id="speed-alert">SPEED UP!!!</div>
 
     <div id="stage">
         <div id="duck-avatar">🦆🎸</div>
@@ -230,6 +176,7 @@
         const BPM = 140; 
         const MAX_LIVES = 10;
         let lives = MAX_LIVES;
+        
         let currentSpeedFactor = 1.0; 
         let BASE_NOTE_SPEED = 6;
         let noteSpeed = BASE_NOTE_SPEED;
@@ -243,6 +190,7 @@
         let multiplier = 1;
         let isPlaying = false;
         let spawner;
+        let accelerator;
         
         const music = document.getElementById('bg-music');
         const statusText = document.getElementById('music-status');
@@ -254,35 +202,11 @@
             statusText.style.color = "red";
         });
 
-        // --- GESTION MUSIQUE ET VITESSE ---
-        music.addEventListener('ended', () => {
-            accelerateGame();
-        });
-
-        function accelerateGame() {
-            currentSpeedFactor += 0.01;
-            music.playbackRate = currentSpeedFactor;
-            music.currentTime = 0;
-            music.play();
-
-            noteSpeed = BASE_NOTE_SPEED * currentSpeedFactor;
-
-            clearInterval(spawner);
-            let newInterval = (1000 / BPM) / currentSpeedFactor; 
-            spawner = setInterval(spawnNote, newInterval);
-
-            document.getElementById('speed-info').innerText = "VITESSE: " + Math.round(currentSpeedFactor * 100) + "%";
-            document.getElementById('speed-info').style.color = "#ff0055";
-
-            const alertBox = document.getElementById('speed-alert');
-            alertBox.classList.add('zoom-effect');
-            setTimeout(() => alertBox.classList.remove('zoom-effect'), 1500);
-        }
-
         function startGame() {
             document.getElementById('start-screen').style.display = 'none';
             
             music.volume = 1.0; 
+            music.playbackRate = 1.0;
             music.play().catch(e => {
                 alert("Impossible de lire canard.mp3 !");
             });
@@ -293,16 +217,47 @@
             
             gameLoop();
             
-            let interval = (1000 / BPM); 
-            spawner = setInterval(spawnNote, interval);
+            // Premier spawn
+            updateSpawner();
             
-            // Headbang synchro
+            // ACCÉLÉRATION : Toutes les 5 secondes
+            accelerator = setInterval(increaseDifficulty, 5000);
+
+            // Headbang
             setInterval(() => {
                 if(isPlaying) {
                     duck.style.transform = "rotate(15deg) translateY(20px)";
                     setTimeout(() => duck.style.transform = "rotate(-15deg) translateY(0)", (300 / currentSpeedFactor));
                 }
             }, (60000/BPM) / currentSpeedFactor);
+        }
+
+        // Fonction appelée toutes les 5 secondes
+        function increaseDifficulty() {
+            if (!isPlaying) return;
+
+            // +3% de vitesse
+            currentSpeedFactor += 0.03;
+            
+            // Mise à jour musique
+            music.playbackRate = currentSpeedFactor;
+            
+            // Mise à jour notes
+            noteSpeed = BASE_NOTE_SPEED * currentSpeedFactor;
+
+            // Mise à jour fréquence spawn
+            updateSpawner();
+
+            // Affichage
+            let displaySpeed = Math.round(currentSpeedFactor * 100);
+            document.getElementById('speed-info').innerText = "VITESSE: " + displaySpeed + "%";
+            document.getElementById('speed-info').style.color = "#ff0055";
+        }
+
+        function updateSpawner() {
+            clearInterval(spawner);
+            let newInterval = (60000 / BPM) / currentSpeedFactor; 
+            spawner = setInterval(spawnNote, newInterval);
         }
 
         function spawnNote() {
@@ -330,7 +285,6 @@
                 note.y += noteSpeed;
                 note.el.style.top = note.y + 'px';
 
-                // --- GESTION DES NOTES RATÉES ---
                 if (note.y > 650) {
                     note.active = false;
                     note.el.remove();
@@ -338,7 +292,6 @@
                     resetCombo();
                     showFeedback("MISS", note.track, "red");
                     
-                    // PERTE DE VIE
                     lives--;
                     updateLivesUI();
                     
@@ -366,6 +319,7 @@
         function endGame() {
             isPlaying = false;
             clearInterval(spawner);
+            clearInterval(accelerator);
             music.pause();
             document.getElementById('final-score').innerText = score;
             document.getElementById('end-screen').style.display = 'flex';
@@ -444,21 +398,6 @@
             setTimeout(() => el.remove(), 500);
         }
 
-        function createExplosion(trackIndex) {
-            const track = tracks[trackIndex];
-            const boom = document.createElement('div');
-            boom.innerText = "💥";
-            boom.style.position = "absolute";
-            boom.style.bottom = "20px";
-            boom.style.left = "50%";
-            boom.style.transform = "translateX(-50%)";
-            boom.style.fontSize = "60px";
-            boom.style.zIndex = "5";
-            track.appendChild(boom);
-            setTimeout(() => boom.remove(), 200);
-        }
-
-        // Allow manual finish: send current score to opener and close
         function sendScoreAndClose() {
             try {
                 const url = `/map?level=3&score=${encodeURIComponent(score)}`;
@@ -466,16 +405,12 @@
             } catch (e) {}
         }
 
-
         let saisie = "";
         document.addEventListener('keydown', (e) => {
             saisie += e.key.toLowerCase();
-            // Easter egg : si on tape "snake", on est redirigé
             if (!"snake".startsWith(saisie)) saisie = e.key === 's' ? 's' : '';
             if (saisie === "snake") window.location.href = "snake.html";
         });
-
-        
 
     </script>
 </body>
