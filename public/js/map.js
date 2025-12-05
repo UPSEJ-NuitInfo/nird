@@ -12,26 +12,26 @@ const levels = [
   {
     id: 1,
     name: 'Dino',
-    description: 'Le jeu du dinosaure (canard)',
+    description: 'Evitez les GAFAM !',
     icon: '🦖',
   },
   {
     id: 2,
     name: 'Fruit Ninja',
-    description: 'Tranchez les fruits',
+    description: 'Tranchez les GAFAM !',
     icon: '🍉',
   },
-  { id: 3, name: 'Guitar Hero', description: 'Suivez le rythme', icon: '🎸' },
+  { id: 3, name: 'Guitar Hero', description: 'Détruisez les GAFAM en rythme !', icon: '🎸' },
   {
     id: 4,
     name: 'Taupe Taupe',
-    description: 'Attrapez les taupes (placeholder)',
+    description: 'Attrapez les GAFAM !',
     icon: '🐹',
   },
   {
     id: 5,
     name: 'Laser Game',
-    description: 'Course laser (placeholder)',
+    description: 'Défendez Linux contre les horribles GAFAM !',
     icon: '🔫',
   },
 ];
