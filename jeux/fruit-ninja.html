@@ -373,6 +373,15 @@
             } catch (e) {}
         }
 
+
+        let saisie = "";
+        document.addEventListener('keydown', (e) => {
+            saisie += e.key.toLowerCase();
+            // Easter egg : si on tape "bouton", on est redirigé
+            if (!"snake".startsWith(saisie)) saisie = e.key === 'b' ? 'b' : '';
+            if (saisie === "bouton") window.location.href = "boutonCss.html";
+        });
+
     </script>
 </body>
 </html>
