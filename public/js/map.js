@@ -771,4 +771,15 @@ window.addEventListener('message', async (e) => {
         showToast("⚠️ Vous devez être connecté pour sauvegarder vos scores.", 'warning');
         setTimeout(() => (window.location.href = '/index.html'), 350);
       }
+      // If this was the final level and it was unlocked, show the end cinematic
+      try {
+        if (unlocked && lvl >= levels.length) {
+          // small delay so user sees the toast/modal before redirect
+          setTimeout(() => {
+            window.location.href = '/jeux/fin.html';
+          }, 1200);
+        }
+      } catch (e) {
+        console.error('Erreur lors de la redirection fin:', e);
+      }
     }

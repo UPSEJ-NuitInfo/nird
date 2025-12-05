@@ -89,11 +89,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  /* background only behind the title block */
-  background: rgba(6,24,38,0.6);
-  padding: 10px 14px;
-  border-radius: 10px;
-  margin-bottom: 8px; /* give some breathing space under the badge */
+  /* keep title block transparent so it blends with the page */
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 .map-header h1 {
