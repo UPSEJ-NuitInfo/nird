@@ -230,11 +230,14 @@
   <div class="game">
       <div class="game-over-screen" id="gameOverScreen">
         <div class="game-over-content">
-          <div class="game-over-title">Partie Terminée !</div>
-          <div style="opacity:0.8">Votre score final</div>
-          <div class="final-score-box" id="finalScoreDisplay">0</div>
-          <button class="restart-btn" id="restartOverlayBtn">Rejouer</button>
-        </div>
+                <div class="game-over-title">Partie Terminée !</div>
+                <div style="opacity:0.8">Votre score final</div>
+                <div class="final-score-box" id="finalScoreDisplay">0</div>
+                <div style="display:flex;gap:12px;justify-content:center;margin-top:8px;">
+                  <button class="restart-btn" id="restartOverlayBtn">Rejouer</button>
+                  <button class="restart-btn" id="returnMapBtn">Retour à la map</button>
+                </div>
+              </div>
       </div>
 
       <div class="legend">
@@ -500,6 +503,15 @@
   startBtn.addEventListener('click', startGame);
   stopBtn.addEventListener('click', endGame);
   restartOverlayBtn.addEventListener('click', startGame); // Bouton de l'overlay
+  const returnMapBtn = document.getElementById('returnMapBtn');
+  if (returnMapBtn) {
+    returnMapBtn.addEventListener('click', () => {
+      // redirect back to map with level=4 and score
+      try {
+        window.location.href = `/map?level=4&score=${encodeURIComponent(score)}`;
+      } catch (e) { /* ignore */ }
+    });
+  }
 
   window.addEventListener('keydown',(e)=>{
     if (e.code==='Space') {
