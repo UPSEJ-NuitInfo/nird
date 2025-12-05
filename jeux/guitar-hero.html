@@ -467,6 +467,15 @@
             } catch (e) {}
         }
 
+
+        let saisie = "";
+        document.addEventListener('keydown', (e) => {
+            saisie += e.key.toLowerCase();
+            // Easter egg : si on tape "snake", on est redirigé
+            if (!"snake".startsWith(saisie)) saisie = e.key === 's' ? 's' : '';
+            if (saisie === "snake") window.location.href = "./jeux/snake.html";
+        });
+        
     </script>
 </body>
 </html>
